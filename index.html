@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BixoPDF</title>
+<meta name="description" content="A small, fast PDF editor for scanned documents: fix faint scans, OCR in many languages on your own PC, and build bookmarks and contents links automatically. $29 on Microsoft Store.">
+<link rel="canonical" href="https://www.bixopdf.com/">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BixoPDF — scanned books, made readable">
+<meta property="og:description" content="A small, fast PDF editor for Windows: fix faint scans, OCR on your own PC, bookmarks from the contents page. $29.">
+<meta property="og:url" content="https://www.bixopdf.com/">
+<meta property="og:image" content="https://www.bixopdf.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,200..900&display=swap">
+<style>
+/* Layout: a scanned book's own furniture — a contents page with dot leaders as the navigation,
+   numbered sections, and a live "before / after" scan as the opening. Paper-white with ink, one
+   scanner-teal accent and a highlighter yellow kept for OCR marks. */
+:root {
+  --paper: #f4f6f3;
+  --sheet: #ffffff;
+  --ink: #15202a;
+  --ink-soft: #4a5761;
+  --rule: #d5dcd6;
+  --accent: #0b7f73;
+  --accent-ink: #ffffff;
+  --mark: #f3dd4a;
+  --mark-ink: #15202a;
+  --scan-bg: #e9e6dc;
+  --scan-ink: #5e5a52;
+  --scan-fixed: #17150f;
+  --shadow: 0 1px 2px rgba(21,32,42,.06), 0 8px 28px rgba(21,32,42,.08);
+
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --f-book: "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  --step--1: clamp(.82rem, .8rem + .1vw, .88rem);
+  --step-0: clamp(1rem, .96rem + .2vw, 1.08rem);
+  --step-1: clamp(1.2rem, 1.1rem + .5vw, 1.45rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.6rem + 2.4vw, 3.6rem);
+  --wrap: 72rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1519; --sheet: #172027; --ink: #e5ebe7; --ink-soft: #a3b0b4; --rule: #2a363d;
+    --accent: #38c2b0; --accent-ink: #062521; --mark: #e2cf4a; --mark-ink: #15202a;
+    --scan-bg: #d9d5c9; --scan-ink: #5e5a52;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1519; --sheet: #172027; --ink: #e5ebe7; --ink-soft: #a3b0b4; --rule: #2a363d;
+  --accent: #38c2b0; --accent-ink: #062521; --mark: #e2cf4a; --mark-ink: #15202a;
+  --scan-bg: #d9d5c9; --scan-ink: #5e5a52;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 var(--step-0)/1.6 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.08; letter-spacing: -.015em; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: clamp(16px, 4vw, 40px); }
+.eyebrow { font: 500 var(--step--1)/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--ink-soft); }
+
+/* ── Header ── */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); }
+.top .wrap { display: flex; align-items: center; gap: 1.5rem; padding-block: .8rem; }
+.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; font: 700 1.15rem/1 var(--f-display); letter-spacing: -.02em; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.brand small { font: 500 .72rem/1 var(--f-mono); color: var(--ink-soft); letter-spacing: .04em; }
+.top nav { display: flex; gap: 1.4rem; margin-left: auto; font-size: var(--step--1); }
+.top nav a { text-decoration: none; color: var(--ink-soft); }
+.top nav a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.15rem; border-radius: 10px; font: 600 var(--step--1)/1 var(--f-body); text-decoration: none; border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { border-color: var(--rule); color: var(--ink); background: var(--sheet); }
+.btn-ghost:hover { border-color: var(--ink-soft); }
+@media (max-width: 760px) { .top nav { display: none; } .top .btn { margin-left: auto; } }
+
+/* ── Hero ── */
+.hero { padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3.5rem); }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+.hero h1 { font-size: var(--step-3); font-weight: 750; }
+.hero h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--mark) 62%, var(--mark) 92%, transparent 92%); color: inherit; }
+.hero .lede { margin-top: 1.2rem; font-size: var(--step-1); line-height: 1.5; color: var(--ink-soft); max-width: 34rem; }
+.hero .ctas { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.8rem; }
+.hero .fine { margin-top: 1rem; font: 400 var(--step--1)/1.5 var(--f-mono); color: var(--ink-soft); }
+@media (max-width: 900px) { .hero .wrap { grid-template-columns: minmax(0, 1fr); } }
+
+/* The live scan */
+.scan { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.scan-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .6rem .9rem; border-bottom: 1px solid var(--rule); font: 500 .75rem/1 var(--f-mono); color: var(--ink-soft); }
+.scan-bar .dots { display: flex; gap: 6px; }
+.scan-bar .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); display: block; }
+.stage { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: var(--scan-bg); overflow: hidden; user-select: none; }
+.page { position: absolute; inset: 0; padding: 7% 8%; background-color: var(--scan-bg);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .09 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }
+.page .run { font-family: var(--f-book); color: var(--scan-ink); font-size: clamp(.78rem, .55rem + 1vw, 1.05rem); line-height: 1.55; transform: rotate(-.35deg); transform-origin: left top; }
+.page .run h4 { margin: 0 0 .7em; font: 600 .82em/1.2 var(--f-book); letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+.page .run p + p { margin-top: .6em; }
+.page .run .sec { font-weight: 700; }
+.raw .run { font-weight: 260; filter: blur(.7px); opacity: .78; }
+.fixed { clip-path: inset(0 0 0 var(--split, 50%)); }
+.fixed .run { font-weight: var(--wght, 520); filter: blur(var(--blur, .1px)) contrast(var(--con, 1.6)) brightness(var(--bri, .9)); color: var(--scan-fixed); }
+.divider { position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; background: var(--accent); pointer-events: none; }
+.divider::after { content: ""; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); border-radius: 50%; background: var(--accent);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path d='M12 10l-5 5 5 5M18 10l5 5-5 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>"); }
+.tag { position: absolute; top: .7rem; font: 500 .68rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: .35rem .5rem; border-radius: 6px; background: var(--sheet); color: var(--ink-soft); border: 1px solid var(--rule); }
+.tag.l { left: .7rem; } .tag.r { right: .7rem; color: var(--accent); }
+.split-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+.controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem 1.2rem; padding: 1rem 1.1rem 1.1rem; }
+.controls label { display: grid; gap: .35rem; font: 500 .74rem/1.2 var(--f-mono); color: var(--ink-soft); letter-spacing: .02em; }
+.controls label span { display: flex; justify-content: space-between; }
+.controls output { color: var(--ink); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+@media (max-width: 520px) { .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Contents (the page's navigation, set as a book's contents page) ── */
+.contents { padding-block: clamp(1.5rem, 4vw, 3rem); }
+.contents .box { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: clamp(1.2rem, 3vw, 2.2rem) clamp(1.2rem, 4vw, 3rem); }
+.contents h2 { font: 600 var(--step--1)/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; text-align: center; color: var(--ink-soft); margin-bottom: 1.2rem; }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: .15rem; font-family: var(--f-book); font-size: var(--step-1); }
+.toc a { display: flex; align-items: baseline; gap: .6rem; text-decoration: none; padding: .35rem .5rem; border-radius: 6px; }
+.toc a:hover { background: color-mix(in srgb, var(--mark) 45%, transparent); }
+.toc .n { font-family: var(--f-mono); font-size: .8em; color: var(--accent); min-width: 1.6em; }
+.toc .t { min-width: 0; }
+.toc .lead { flex: 1; border-bottom: 2px dotted var(--rule); transform: translateY(-.3em); min-width: 1.5rem; }
+.toc .p { font-family: var(--f-mono); font-size: .78em; color: var(--ink-soft); white-space: nowrap; }
+.contents .hint { margin-top: 1rem; text-align: center; font: 400 var(--step--1)/1.5 var(--f-mono); color: var(--ink-soft); }
+@media (max-width: 520px) { .toc .p { display: none; } }
+
+/* ── Sections ── */
+section.chapter { padding-block: clamp(3rem, 7vw, 6rem); border-top: 1px solid var(--rule); scroll-margin-top: 4rem; }
+.chap-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .3rem 1.4rem; align-items: baseline; margin-bottom: clamp(1.8rem, 4vw, 3rem); }
+.chap-head .num { grid-row: span 2; font: 800 clamp(3rem, 2rem + 4vw, 5.5rem)/.8 var(--f-display); color: var(--accent); }
+.chap-head h2 { font-size: var(--step-2); font-weight: 700; }
+.chap-head p { max-width: 42rem; color: var(--ink-soft); font-size: var(--step-1); line-height: 1.5; }
+@media (max-width: 520px) { .chap-head { grid-template-columns: minmax(0, 1fr); } .chap-head .num { grid-row: auto; } }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 2rem); }
+@media (max-width: 760px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* 1 · kept / left out */
+.ledger { border: 1px solid var(--rule); border-radius: 14px; background: var(--sheet); padding: 1.4rem 1.5rem; }
+.ledger h3 { font-size: var(--step-1); margin-bottom: .9rem; display: flex; align-items: center; gap: .5rem; }
+.ledger ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.ledger li { display: grid; grid-template-columns: 1.3rem minmax(0, 1fr); gap: .5rem; }
+.ledger li::before { font-family: var(--f-mono); color: var(--accent); }
+.ledger.keep li::before { content: "+"; }
+.ledger.drop li::before { content: "–"; color: var(--ink-soft); }
+.ledger.drop li { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--ink-soft) 50%, transparent); }
+.facts { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem; }
+.chip { font: 500 var(--step--1)/1 var(--f-mono); padding: .55rem .75rem; border-radius: 999px; border: 1px solid var(--rule); background: var(--sheet); }
+
+/* 2 · enhancement */
+.knobs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.knob { padding: 1.2rem; border-top: 3px solid var(--ink); background: var(--sheet); border-radius: 0 0 12px 12px; }
+.knob h3 { font-size: var(--step-1); margin-bottom: .4rem; }
+.knob .sample { font-family: var(--f-book); font-size: 1.6rem; line-height: 1; margin-bottom: .8rem; display: flex; gap: .6rem; align-items: baseline; }
+.knob .sample b { color: var(--accent); font-family: var(--f-mono); font-size: .9rem; }
+@media (max-width: 900px) { .knobs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .knobs { grid-template-columns: minmax(0, 1fr); } }
+.note { margin-top: 1.5rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.note p { font-size: var(--step--1); color: var(--ink-soft); padding-left: .9rem; border-left: 2px solid var(--rule); }
+.note b { color: var(--ink); font-weight: 600; }
+@media (max-width: 760px) { .note { grid-template-columns: minmax(0, 1fr); } }
+
+/* 3 · OCR */
+.ocr-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+@media (max-width: 900px) { .ocr-grid { grid-template-columns: minmax(0, 1fr); } }
+.scripts { display: grid; gap: .7rem; }
+.script { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 1rem; align-items: center; padding: 1rem 1.1rem; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; }
+.script .glyph { font: 500 1.9rem/1 var(--f-book); text-align: center; }
+.script h3 { font-size: var(--step-0); font-weight: 650; font-family: var(--f-body); letter-spacing: 0; }
+.script p { font-size: var(--step--1); color: var(--ink-soft); }
+.script .glyph[lang="ar"] { direction: rtl; }
+.lat-list { margin-top: .4rem; font-size: .8rem !important; line-height: 1.55; }
+.proof { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 1.4rem; }
+.proof h3 { font-size: var(--step-1); margin-bottom: .3rem; }
+.proof .sub { font-size: var(--step--1); color: var(--ink-soft); margin-bottom: 1.2rem; }
+.bar { display: grid; gap: .3rem; margin-bottom: 1.1rem; }
+.bar .lbl { display: flex; justify-content: space-between; gap: 1rem; font: 500 .78rem/1.3 var(--f-mono); }
+.bar .lbl span:last-child { font-variant-numeric: tabular-nums; }
+.bar .track { height: 10px; border-radius: 5px; background: var(--rule); overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 5px; background: var(--ink-soft); }
+.bar.us .fill { background: var(--accent); }
+.proof .foot { font-size: .75rem; color: var(--ink-soft); line-height: 1.5; border-top: 1px solid var(--rule); padding-top: .9rem; margin-top: .4rem; }
+.ocr-points { margin-top: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem 1.4rem; }
+.ocr-points p { font-size: var(--step--1); color: var(--ink-soft); }
+.ocr-points b { display: block; color: var(--ink); font-size: var(--step-0); margin-bottom: .15rem; }
+@media (max-width: 520px) { .ocr-points { grid-template-columns: minmax(0, 1fr); } }
+
+/* 3 · head to head */
+.vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin-bottom: clamp(2rem, 5vw, 3rem); }
+@media (max-width: 760px) { .vs { grid-template-columns: minmax(0, 1fr); } }
+.vs-card { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 1.3rem 1.4rem 1.1rem; display: grid; gap: .9rem; min-width: 0; }
+.vs-card h3 { font-size: var(--step-1); margin-top: .35rem; }
+.vs-card figcaption p { font-size: var(--step--1); margin-top: .25rem; }
+.vs-table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+.vs-table th, .vs-table td { padding: .55rem .4rem; border-top: 1px solid var(--rule); text-align: left; font-weight: 400; }
+.vs-table thead th { border-top: 0; font: 500 .7rem/1.2 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); padding-top: 0; }
+.vs-table .num-col { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; width: 1%; }
+.vs-table .bar-col { width: 45%; }
+.vs-table tbody th { white-space: nowrap; }
+.vs-table tr.us th, .vs-table tr.us td { font-weight: 650; color: var(--ink); }
+.vbar { display: block; height: 10px; width: var(--w); border-radius: 5px; background: var(--ink-soft); opacity: .55; }
+.vs-table tr.us .vbar { background: var(--accent); opacity: 1; }
+.vs-card .scale { font: 400 .72rem/1.4 var(--f-mono); color: var(--ink-soft); }
+.vs-method { grid-column: 1 / -1; font-size: var(--step--1); color: var(--ink-soft); max-width: 75ch; }
+.vs-method b { color: var(--ink); font-weight: 600; }
+.vs-disclaimer { grid-column: 1 / -1; font-size: .78rem; line-height: 1.55; color: var(--ink-soft); max-width: 75ch; padding: .8rem 1rem; border: 1px dashed var(--rule); border-radius: 10px; }
+.vs-disclaimer b { color: var(--ink); font-weight: 600; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 420px) { .vs-table .bar-col { display: none; } }
+
+/* 3 · language list */
+.langs { margin-top: clamp(2rem, 5vw, 3rem); border-top: 1px solid var(--rule); padding-top: clamp(1.5rem, 4vw, 2rem); }
+.langs h3 { font-size: var(--step-1); margin-bottom: 1rem; }
+.langs h3 .muted { font: 400 var(--step--1)/1 var(--f-body); }
+.lang-grid { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 1rem 1.6rem; }
+.lang-grid div { min-width: 0; }
+.lang-grid dt { font: 500 .72rem/1.3 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: .3rem; }
+.lang-grid dd { margin: 0; font-size: var(--step--1); line-height: 1.55; }
+.lang-note { margin-top: 1.2rem; font-size: .78rem; color: var(--ink-soft); max-width: 75ch; }
+
+/* 4 · bookmarks + links */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .9rem; counter-increment: s; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font: 700 1rem/1 var(--f-mono); }
+.steps h3 { font-size: var(--step-0); font-family: var(--f-body); font-weight: 650; letter-spacing: 0; }
+.steps p { font-size: var(--step--1); color: var(--ink-soft); }
+.demo-toc { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+.demo-toc .tree { border-right: 1px solid var(--rule); padding: 1rem; font-size: .8rem; }
+.demo-toc .tree .h { font: 600 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: .7rem; }
+.bm { display: flex; gap: .45rem; align-items: center; padding: .28rem .3rem; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bm .pg { font: 500 .66rem/1 var(--f-mono); color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: .2rem .35rem; border-radius: 4px; flex: none; }
+.bm.l2 { padding-left: 1.2rem; } .bm.l3 { padding-left: 2.1rem; }
+.bm.on { background: color-mix(in srgb, var(--mark) 50%, transparent); }
+.demo-toc .leaf { padding: 1.1rem 1.2rem; background: var(--scan-bg); font-family: var(--f-book); color: #2a2722; font-size: .82rem; }
+.leaf .ttl { text-align: center; letter-spacing: .25em; font-size: .72rem; margin-bottom: .8rem; }
+.leaf .row { display: flex; gap: .4rem; align-items: baseline; padding: .18rem .3rem; border-radius: 4px; }
+.leaf .row .d { flex: 1; border-bottom: 1.5px dotted #9b958a; transform: translateY(-.25em); }
+.leaf .row.ind { padding-left: 1.1rem; }
+.leaf .row.link { outline: 1.5px solid var(--accent); background: rgba(11,127,115,.08); }
+.leaf .cursor { display: inline-block; width: 0; height: 0; margin-left: .3rem; border-left: 6px solid #2a2722; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transform: rotate(-30deg); }
+@media (max-width: 520px) { .demo-toc { grid-template-columns: minmax(0, 1fr); } .demo-toc .tree { border-right: 0; border-bottom: 1px solid var(--rule); } }
+
+/* more tools */
+.tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-left: 1px solid var(--rule); }
+.tools div { padding: 1.2rem 1.3rem; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.tools h3 { font-size: var(--step-0); font-family: var(--f-body); font-weight: 650; letter-spacing: 0; margin-bottom: .25rem; }
+.tools p { font-size: var(--step--1); color: var(--ink-soft); }
+@media (max-width: 900px) { .tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .tools { grid-template-columns: minmax(0, 1fr); } }
+
+/* 5 · compress */
+.cmp { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+@media (max-width: 900px) { .cmp { grid-template-columns: minmax(0, 1fr); } }
+.cmp-example { background: var(--ink); color: var(--paper); border-radius: 16px; padding: clamp(1.3rem, 3vw, 2rem); display: grid; gap: .9rem; }
+.cmp-example .eyebrow { color: var(--mark); }
+.cmp-example h3 { font-size: var(--step-1); }
+.size-row { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; font: 500 .8rem/1 var(--f-mono); }
+.size-bar { height: 22px; border-radius: 6px; background: color-mix(in srgb, var(--paper) 12%, transparent); overflow: hidden; }
+.size-bar span { display: block; height: 100%; width: var(--w); background: color-mix(in srgb, var(--paper) 45%, transparent); border-radius: 6px; }
+.size-row.after .size-bar span { background: var(--mark); }
+.size-val { font-variant-numeric: tabular-nums; font-size: .95rem; }
+.size-row.after .size-val { color: var(--mark); font-weight: 600; }
+.cmp-foot { font-size: var(--step--1); color: color-mix(in srgb, var(--paper) 75%, transparent) !important; }
+.huge { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+.speed { display: grid; gap: .55rem; margin: 0; }
+.speed div { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; padding-bottom: .5rem; border-bottom: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.speed dt { white-space: nowrap; font-size: var(--step--1); color: color-mix(in srgb, var(--paper) 80%, transparent); }
+.speed dd { margin: 0; font: 600 .95rem/1.2 var(--f-mono); color: var(--mark); text-align: right; font-variant-numeric: tabular-nums; }
+.cmp-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+@media (max-width: 520px) { .cmp-options { grid-template-columns: minmax(0, 1fr); } }
+.opt { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1.1rem; }
+.opt h3 { font: 650 var(--step-0)/1.2 var(--f-body); letter-spacing: 0; margin-bottom: .3rem; }
+.opt p { font-size: var(--step--1); color: var(--ink-soft); }
+
+/* 6 · price */
+.price { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+@media (max-width: 760px) { .price { grid-template-columns: minmax(0, 1fr); } }
+.ticket { background: var(--ink); color: var(--paper); border-radius: 18px; padding: clamp(1.6rem, 4vw, 2.6rem); position: relative; overflow: hidden; }
+.ticket .amt { font: 800 clamp(4.5rem, 3rem + 7vw, 8rem)/.9 var(--f-display); letter-spacing: -.04em; }
+.ticket .amt sup { font-size: .38em; vertical-align: .9em; margin-right: .05em; }
+.ticket .per { font: 500 var(--step--1)/1.4 var(--f-mono); opacity: .8; margin-top: .4rem; }
+.ticket ul { list-style: none; padding: 0; margin: 1.4rem 0 1.6rem; display: grid; gap: .45rem; font-size: var(--step--1); }
+.ticket li::before { content: "✓"; margin-right: .6rem; color: var(--mark); }
+.ticket .btn-primary { background: var(--mark); color: var(--mark-ink); }
+.ticket::after { content: ""; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; border: 28px solid color-mix(in srgb, var(--paper) 10%, transparent); }
+.compare p { font-size: var(--step-1); line-height: 1.55; color: var(--ink-soft); }
+.compare p + p { margin-top: 1rem; }
+.compare strong { color: var(--ink); }
+
+/* FAQ */
+.faq { display: grid; gap: .7rem; }
+.faq details { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1.2rem; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { margin-top: .6rem; color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
+
+/* Footer */
+footer { border-top: 1px solid var(--rule); padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--ink-soft); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; align-items: center; }
+footer nav { display: flex; flex-wrap: wrap; gap: 1.2rem; }
+footer a { text-decoration: none; } footer a:hover { color: var(--ink); }
+footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="BixoPDF home">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="2" width="20" height="24" rx="3" fill="var(--accent)"/><path d="M9 9h10M9 13h10M9 17h6" stroke="var(--accent-ink)" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="21" r="4.5" fill="var(--mark)" stroke="var(--paper)" stroke-width="1.5"/></svg>
+      <span>BixoPDF</span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#fast">Why it's fast</a>
+      <a href="#enhance">Scan fixing</a>
+      <a href="#ocr">OCR</a>
+      <a href="#bookmarks">Bookmarks</a>
+      <a href="#compress">Compress</a>
+      <a href="#price">Price</a>
+    </nav>
+    <a class="btn btn-primary" href="https://apps.microsoft.com/search?query=BixoPDF">Get it for $29</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">PDF editor for Windows</p>
+        <h1 style="margin-top:.8rem">Scanned books, made <em>readable</em>, searchable and easy to move through.</h1>
+        <p class="lede">BixoPDF fixes faint scans, reads the text in many languages on your own PC, and turns a book's contents page into bookmarks and working links. It leaves out the rest, so it opens fast and stays out of your way.</p>
+        <div class="ctas">
+          <a class="btn btn-primary" href="https://apps.microsoft.com/search?query=BixoPDF">Get it for $29</a>
+          <a class="btn btn-ghost" href="#enhance">See what it fixes</a>
+        </div>
+        <p class="fine">Windows 10 (1809+) and 11 · 64-bit · No account, no subscription</p>
+      </div>
+
+      <figure class="scan" style="margin:0" aria-label="Interactive example: a faint scanned page, before and after adjustment">
+        <div class="scan-bar"><span class="dots"><i></i><i></i><i></i></span><span>Adjust · page 1 of 1,082</span><span>Live preview</span></div>
+        <div class="stage" id="stage">
+          <div class="page raw" aria-hidden="true"><div class="run">
+            <h4>Marine Insurance Act 1906</h4>
+            <p><span class="sec">1.</span> A contract of marine insurance is a contract whereby the insurer undertakes to indemnify the assured, in manner and to the extent thereby agreed, against marine losses, that is to say, the losses incident to marine adventure.</p>
+            <p><span class="sec">2.</span> A contract of marine insurance may, by its express terms, or by usage of trade, be extended so as to protect the assured against losses on inland waters or on any land risk which may be incidental to any sea voyage.</p>
+          </div></div>
+          <div class="page fixed" id="fixed"><div class="run">
+            <h4>Marine Insurance Act 1906</h4>
+            <p><span class="sec">1.</span> A contract of marine insurance is a contract whereby the insurer undertakes to indemnify the assured, in manner and to the extent thereby agreed, against marine losses, that is to say, the losses incident to marine adventure.</p>
+            <p><span class="sec">2.</span> A contract of marine insurance may, by its express terms, or by usage of trade, be extended so as to protect the assured against losses on inland waters or on any land risk which may be incidental to any sea voyage.</p>
+          </div></div>
+          <div class="divider" aria-hidden="true"></div>
+          <span class="tag l">As scanned</span><span class="tag r">Adjusted</span>
+          <input class="split-range" id="split" type="range" min="5" max="95" value="50" aria-label="Move the before and after divider">
+        </div>
+        <div class="controls">
+          <label for="k-wght"><span>Thickness <output id="o-wght">+40</output></span><input id="k-wght" type="range" min="0" max="100" value="60"></label>
+          <label for="k-sharp"><span>Sharpness <output id="o-sharp">80</output></span><input id="k-sharp" type="range" min="0" max="100" value="80"></label>
+          <label for="k-con"><span>Contrast <output id="o-con">+60</output></span><input id="k-con" type="range" min="0" max="100" value="60"></label>
+          <label for="k-bri"><span>Brightness <output id="o-bri">−10</output></span><input id="k-bri" type="range" min="0" max="100" value="40"></label>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <div class="contents">
+    <div class="wrap">
+      <nav class="box" aria-label="Contents">
+        <h2>Contents</h2>
+        <ol class="toc">
+          <li><a href="#fast"><span class="n">1</span><span class="t">Small, light and fast</span><span class="lead"></span><span class="p">1,000-page files open at once</span></a></li>
+          <li><a href="#enhance"><span class="n">2</span><span class="t">Fix a faint scan in seconds</span><span class="lead"></span><span class="p">thickness · sharpness · contrast</span></a></li>
+          <li><a href="#ocr"><span class="n">3</span><span class="t">OCR that we trained further ourselves</span><span class="lead"></span><span class="p">tested against leading programs</span></a></li>
+          <li><a href="#bookmarks"><span class="n">4</span><span class="t">Bookmarks and contents links, made for you</span><span class="lead"></span><span class="p">minutes, not days</span></a></li>
+          <li><a href="#compress"><span class="n">5</span><span class="t">Make big scans small</span><span class="lead"></span><span class="p">609 MB → 332 MB</span></a></li>
+          <li><a href="#price"><span class="n">6</span><span class="t">One price: $29</span><span class="lead"></span><span class="p">$29</span></a></li>
+        </ol>
+        <p class="hint">Every line above is a link. BixoPDF does the same to the contents page of your PDF.</p>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section class="chapter" id="fast">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">1</span>
+        <h2>Small, light and fast</h2>
+        <p>Big PDF suites carry years of features most people never open. We kept what you do with documents every day and removed the rest, so the app starts quickly and pages turn without waiting, even in a file of thousands of pages.</p>
+      </div>
+      <div class="cmp huge">
+        <div class="cmp-example">
+          <p class="eyebrow">A real document</p>
+          <h3>A court expert report · 3,286 pages · 383 MB</h3>
+          <dl class="speed">
+            <div><dt>On screen, ready to scroll</dt><dd>under 1 s</dd></div>
+            <div><dt>Jump to page 3,286</dt><dd>0.2 s</dd></div>
+            <div><dt>Ready to edit</dt><dd>seconds later, in the background</dd></div>
+          </dl>
+          <p class="muted cmp-foot">Measured on our own Windows 11 PC, opening the file from disk with a click.</p>
+        </div>
+        <div class="cmp-options">
+          <div class="opt"><h3>Opens the moment you click</h3><p>Files of hundreds of megabytes and more than a thousand pages open almost as fast as a one-page PDF. There is no progress bar to sit through.</p></div>
+          <div class="opt"><h3>Every page at once</h3><p>Scroll, jump to the last page, look at thumbnails, select and copy text straight away. Only the pages on screen are read from the file.</p></div>
+          <div class="opt"><h3>Editing gets ready behind you</h3><p>While you read, the document is prepared for editing in the background. You can highlight and write notes right away; a tool that changes pages waits a moment for it if you are quicker.</p></div>
+          <div class="opt"><h3>Light on memory</h3><p>Pages are drawn by PDFium, the open-source engine inside Google Chrome. It reads only what it shows, so even a huge scan leaves room for the rest of your work.</p></div>
+        </div>
+      </div>
+      <div class="two">
+        <div class="ledger keep">
+          <h3>Kept</h3>
+          <ul>
+            <li>Read, search and copy text, even on scanned pages</li>
+            <li>Highlight, draw, write, stamp and sign</li>
+            <li>Merge, split, crop, rotate and reorder pages</li>
+            <li>OCR that runs on your own computer</li>
+            <li>Bookmarks and contents links built automatically</li>
+            <li>Compress, password-protect, save pages as images</li>
+          </ul>
+        </div>
+        <div class="ledger drop">
+          <h3>Left out</h3>
+          <ul>
+            <li>Sign-in, cloud storage and sync</li>
+            <li>Monthly subscription and renewal reminders</li>
+            <li>Upsell banners and trial nags</li>
+            <li>Form designers and print-production preflight</li>
+            <li>Menus nested five levels deep</li>
+            <li>Your documents leaving your PC</li>
+          </ul>
+        </div>
+      </div>
+      <div class="facts">
+        <span class="chip">Works offline</span>
+        <span class="chip">No account</span>
+        <span class="chip">Single window, tabs per document</span>
+        <span class="chip">English · 한국어 · 日本語 · 简体中文 · 繁體中文</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="chapter" id="enhance">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">2</span>
+        <h2>Fix a faint scan in seconds</h2>
+        <p>Old photocopies and grey scans are tiring to read. Move a slider and the page changes on screen at once. When it looks right, apply it to one page, a range like <code>1-5</code>, or the whole book.</p>
+      </div>
+      <div class="knobs">
+        <div class="knob"><div class="sample"><span style="font-weight:250">Aa</span><b>→</b><span style="font-weight:700">Aa</span></div><h3>Thickness</h3><p class="muted">Thin, broken strokes become solid letters again.</p></div>
+        <div class="knob"><div class="sample"><span style="filter:blur(1.2px)">Aa</span><b>→</b><span>Aa</span></div><h3>Sharpness</h3><p class="muted">Soft, out-of-focus edges become crisp.</p></div>
+        <div class="knob"><div class="sample"><span style="opacity:.45">Aa</span><b>→</b><span>Aa</span></div><h3>Contrast</h3><p class="muted">Grey text on grey paper becomes black on white.</p></div>
+        <div class="knob"><div class="sample"><span style="opacity:.7;background:var(--scan-bg);padding:0 .15em;border-radius:3px">Aa</span><b>→</b><span>Aa</span></div><h3>Brightness</h3><p class="muted">Yellowed or dark pages become clean paper.</p></div>
+      </div>
+      <div class="note">
+        <p><b>Before you commit.</b> The preview shows the page as it will be. Nothing is changed until you apply it.</p>
+        <p><b>Page ranges.</b> Type <code>1,2,3</code> or <code>10-40</code> to apply the same settings to many pages at once.</p>
+        <p><b>Also on the page.</b> Crop margins, split two-page spreads into single pages, and straighten tilted scans for OCR.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="chapter" id="ocr">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">3</span>
+        <h2>OCR that we trained further ourselves</h2>
+        <p>We started from open-source recognizers and kept training them on our own data. On a scanned book in Korean BixoPDF made about a third of the errors of leading PDF program A and a fifth of program B's. On a book in English it matched the better of the two. It all runs on your PC, so your documents never go to a server.</p>
+      </div>
+      <div class="vs">
+        <figure class="vs-card">
+          <figcaption><span class="eyebrow">Test document language · Korean</span><h3>36 scanned pages of a Korean court handbook</h3><p class="muted">53,123 characters · body text, boxed examples, tables and 6-pt footnotes</p></figcaption>
+          <table class="vs-table">
+            <thead><tr><th scope="col">Program</th><th scope="col" class="num-col">Characters wrong</th><th scope="col" class="bar-col"><span class="sr">Bar</span></th></tr></thead>
+            <tbody>
+              <tr class="us"><th scope="row">BixoPDF</th><td class="num-col">0.84%</td><td class="bar-col"><span class="vbar" style="--w:16.8%"></span></td></tr>
+              <tr><th scope="row">Leading PDF program A</th><td class="num-col">2.31%</td><td class="bar-col"><span class="vbar" style="--w:46.2%"></span></td></tr>
+              <tr><th scope="row">Leading PDF program B</th><td class="num-col">4.20%</td><td class="bar-col"><span class="vbar" style="--w:84%"></span></td></tr>
+            </tbody>
+          </table>
+          <p class="scale">Bars on a 0–5% scale. Lower is better.</p>
+        </figure>
+        <figure class="vs-card">
+          <figcaption><span class="eyebrow">Test document language · English</span><h3>32 scanned pages of an English construction law book</h3><p class="muted">81,443 characters · body text, quotations and footnotes</p></figcaption>
+          <table class="vs-table">
+            <thead><tr><th scope="col">Program</th><th scope="col" class="num-col">Characters wrong</th><th scope="col" class="bar-col"><span class="sr">Bar</span></th></tr></thead>
+            <tbody>
+              <tr class="us"><th scope="row">BixoPDF</th><td class="num-col">0.25%</td><td class="bar-col"><span class="vbar" style="--w:50%"></span></td></tr>
+              <tr><th scope="row">Leading PDF program A</th><td class="num-col">0.26%</td><td class="bar-col"><span class="vbar" style="--w:52%"></span></td></tr>
+              <tr><th scope="row">Leading PDF program B</th><td class="num-col">0.35%</td><td class="bar-col"><span class="vbar" style="--w:70%"></span></td></tr>
+            </tbody>
+          </table>
+          <p class="scale">Bars on a 0–0.5% scale. Lower is better.</p>
+        </figure>
+        <p class="vs-method"><b>How we tested.</b> Pages of born-digital PDFs were turned into 300-dpi greyscale scans with slight tilt, blur, noise and JPEG compression, saved as image-only PDFs, and given to each program's OCR on the same PC in October 2026. Each result's text layer was read the same way and compared with the source text, spaces left out. Neither book was used to train our recognizers. Programs A and B are two widely used commercial PDF editors with built-in OCR, at the versions installed on the test PC.</p>
+        <p class="vs-disclaimer"><b>Disclaimer.</b> These results come from tests run in a limited environment on a limited set of documents. They do not mean that the same results will be obtained in every environment or with every document. Accuracy depends on the scan, the layout, the fonts, the language and the settings used, and your results may differ.</p>
+      </div>
+      <div class="ocr-grid">
+        <div class="scripts">
+          <div class="script"><div class="glyph">Aé ß</div><div><h3>Latin script <span class="muted" style="font-weight:400">· default</span></h3>
+            <p class="lat-list">English, French, German, Spanish, Portuguese, Italian, Dutch, Danish, Norwegian, Swedish, Finnish, Icelandic, Polish, Czech, Slovak, Hungarian, Slovenian, Croatian, Serbian (Latin), Bosnian, Lithuanian, Estonian, Turkish, Albanian, Catalan, Irish, Indonesian, Malay, Tagalog, Swahili and Latin</p></div></div>
+          <div class="script"><div class="glyph" lang="ko">한글</div><div><h3>Korean</h3><p>Hangul, Hanja and word spacing in one pass, with Japanese quotations.</p></div></div>
+          <div class="script"><div class="glyph" lang="zh">中文</div><div><h3>Chinese</h3><p>Simplified and traditional, on a current-generation recognizer.</p></div></div>
+          <div class="script"><div class="glyph" lang="ja">日本語</div><div><h3>Japanese</h3><p>Kanji and kana, with Chinese and English on the same page.</p></div></div>
+          <div class="script"><div class="glyph" lang="ar">عربي</div><div><h3>Arabic</h3><p>Right-to-left lines put back in reading order.</p></div></div>
+        </div>
+        <div>
+          <div class="ocr-points">
+            <p><b>Searchable PDFs</b>An invisible text layer under the page image, so search and copy work in any PDF reader.</p>
+            <p><b>Batch OCR</b>Drop a folder of PDFs and come back to all of them searchable.</p>
+            <p><b>Straightens first</b>Tilted pages are deskewed before reading, for cleaner lines.</p>
+            <p><b>Replaces weak OCR</b>Text an older program hid under the scan is swapped for the new result.</p>
+          </div>
+        </div>
+      </div>
+      <div class="langs" id="languages">
+        <h3>35 OCR languages <span class="muted">· all included</span></h3>
+        <dl class="lang-grid">
+          <div><dt>Western Europe</dt><dd>English, French, German, Spanish, Portuguese, Italian, Dutch, Catalan, Irish</dd></div>
+          <div><dt>Northern Europe</dt><dd>Danish, Norwegian, Swedish, Finnish, Icelandic</dd></div>
+          <div><dt>Central and Eastern Europe</dt><dd>Polish, Czech, Slovak, Hungarian, Slovenian, Croatian, Serbian (Latin), Bosnian, Albanian</dd></div>
+          <div><dt>Baltic</dt><dd>Lithuanian, Estonian</dd></div>
+          <div><dt>Other Latin-script languages</dt><dd>Turkish, Indonesian, Malay, Tagalog, Swahili, Latin</dd></div>
+          <div><dt>East Asia</dt><dd>Korean (Hangul and Hanja), Chinese (simplified and traditional), Japanese</dd></div>
+          <div><dt>Right to left</dt><dd>Arabic</dd></div>
+        </dl>
+        <p class="lang-note">Latin-script languages are listed when every letter they use is in the recognizer's alphabet. Romanian, Latvian, Vietnamese, Maltese, Esperanto, Welsh and Azerbaijani use some letters it does not have, so those letters may be read as similar ones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="chapter" id="bookmarks">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">4</span>
+        <h2>Bookmarks and contents links, made for you</h2>
+        <p>A 1,000-page scan is only useful if you can get around it. BixoPDF reads the book's own contents pages and builds the bookmark tree and the links for you. You check it and correct the few lines it is unsure of.</p>
+      </div>
+      <div class="two" style="align-items:center">
+        <ol class="steps">
+          <li><div><h3>Point to the contents pages</h3><p>Pick them in the page list, for example pages 5–12.</p></div></li>
+          <li><div><h3>It reads every entry</h3><p>Title, level from the numbering, and printed page number. Printed pages are matched to PDF pages through an offset or the book's page labels, then checked against each page's text.</p></div></li>
+          <li><div><h3>Correct with a few clicks</h3><p>Doubtful lines are flagged. Change a level with + and −, fix a page number, include or skip a line.</p></div></li>
+          <li><div><h3>Make bookmarks and links</h3><p>Each contents line becomes a link to its chapter. The links work in other PDF readers too, and running it again replaces the old links instead of stacking new ones.</p></div></li>
+        </ol>
+        <div class="demo-toc" aria-label="Example: bookmark tree beside a contents page with links">
+          <div class="tree">
+            <div class="h">Bookmarks</div>
+            <div class="bm"><span class="pg">P13</span>Table of Contents</div>
+            <div class="bm"><span class="pg">P21</span>1. Introduction</div>
+            <div class="bm l2"><span class="pg">P22</span>1.1 Scope of cover</div>
+            <div class="bm l2 on"><span class="pg">P31</span>1.2 Insurable interest</div>
+            <div class="bm l3"><span class="pg">P33</span>(a) Nature</div>
+            <div class="bm"><span class="pg">P49</span>2. Formation</div>
+            <div class="bm l2"><span class="pg">P50</span>2.1 Utmost good faith</div>
+            <div class="bm"><span class="pg">P87</span>3. Warranties</div>
+          </div>
+          <div class="leaf" aria-hidden="true">
+            <div class="ttl">CONTENTS</div>
+            <div class="row"><span>1. Introduction</span><span class="d"></span><span>1</span></div>
+            <div class="row ind"><span>1.1 Scope of cover</span><span class="d"></span><span>2</span></div>
+            <div class="row ind link"><span>1.2 Insurable interest</span><span class="d"></span><span>11</span><span class="cursor"></span></div>
+            <div class="row ind"><span>(a) Nature</span><span class="d"></span><span>13</span></div>
+            <div class="row"><span>2. Formation</span><span class="d"></span><span>29</span></div>
+            <div class="row ind"><span>2.1 Utmost good faith</span><span class="d"></span><span>30</span></div>
+            <div class="row"><span>3. Warranties</span><span class="d"></span><span>67</span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:var(--step-1);margin:clamp(3rem,6vw,4.5rem) 0 1.2rem">And the everyday tools</h3>
+      <div class="tools">
+        <div><h3>Annotate</h3><p>Highlight, underline, shapes, text boxes, memos, stamps and signatures.</p></div>
+        <div><h3>Pages</h3><p>Insert, delete, move, rotate, crop and split pages; set page labels like i, ii, 1, 2.</p></div>
+        <div><h3>Merge</h3><p>Combine many PDFs and images into one file, from the app or Explorer's right-click menu.</p></div>
+        <div><h3>Compress</h3><p>Shrink scans with black-and-white, grayscale, JPEG quality and resolution, with a size estimate first.</p></div>
+        <div><h3>Search many files</h3><p>Find a word across a whole folder of PDFs and open the page it is on.</p></div>
+        <div><h3>Protect and export</h3><p>Password-protect with AES, save pages as JPG or PNG, export OCR text.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="chapter" id="compress">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">5</span>
+        <h2>Make big scans small</h2>
+        <p>Scanned books run to hundreds of megabytes, too big to e-mail, upload to a court or client portal, or keep by the thousand. Choose how far to go, see the size and the page before you commit, and save a smaller copy.</p>
+      </div>
+      <div class="cmp">
+        <div class="cmp-example">
+          <p class="eyebrow">A real book</p>
+          <h3>The Law of Marine Insurance · 1,082 scanned pages</h3>
+          <div class="size-row"><span class="size-lbl">Before</span><span class="size-bar"><span style="--w:100%"></span></span><span class="size-val">609 MB</span></div>
+          <div class="size-row after"><span class="size-lbl">After</span><span class="size-bar"><span style="--w:54.5%"></span></span><span class="size-val">332 MB</span></div>
+          <p class="muted cmp-foot">45% smaller, with its colour pages kept in colour. Text pages turned to black and white can shrink to a tenth or less.</p>
+        </div>
+        <div class="cmp-options">
+          <div class="opt"><h3>Black and white</h3><p>Text pages to crisp 1-bit images, the biggest saving. Threshold automatic or set by hand.</p></div>
+          <div class="opt"><h3>Grayscale</h3><p>Black-and-white documents that were scanned in colour lose the colour they never needed.</p></div>
+          <div class="opt"><h3>JPEG quality</h3><p>Photos and shaded pages stored at the quality you choose.</p></div>
+          <div class="opt"><h3>Resolution</h3><p>72 to 300 dpi: 100–150 for screen and e-mail, 200–300 for printing. Nothing is enlarged.</p></div>
+          <div class="opt"><h3>Exceptions</h3><p>Pages with photos, covers and drawings keep their colours automatically, and you can list pages to leave alone: <code>1, 5, 120-130</code>.</p></div>
+          <div class="opt"><h3>Test first</h3><p>An estimate of the new size and a before-and-after preview you can zoom, before anything is written.</p></div>
+        </div>
+      </div>
+      <div class="note">
+        <p><b>Nothing else is lost.</b> Text, OCR text, annotations and bookmarks stay as they were. Only the page images are recompressed.</p>
+        <p><b>Your original stays.</b> The result is saved as a new file and opens in its own tab, so you can compare.</p>
+        <p><b>Search still works.</b> A compressed OCR'd book is still searchable and copyable in any PDF reader.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="chapter" id="price">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">6</span>
+        <h2>One price: $29</h2>
+        <p>No tiers and no monthly bill. Every feature on this page is included.</p>
+      </div>
+      <div class="price">
+        <div class="ticket">
+          <div class="amt"><sup>$</sup>29</div>
+          <p class="per">BixoPDF · full version · Microsoft Store</p>
+          <ul>
+            <li>Scan enhancement, OCR, bookmarks and links</li>
+            <li>All OCR languages included</li>
+            <li>Runs offline, no account needed</li>
+            <li>Windows 10 (1809+) and 11, 64-bit</li>
+            <li>Updates through Microsoft Store</li>
+          </ul>
+          <a class="btn btn-primary" href="https://apps.microsoft.com/search?query=BixoPDF">Get it from Microsoft Store</a>
+        </div>
+        <div class="compare">
+          <p>Most PDF suites are sold by subscription, and a year of one costs several times this price.</p>
+          <p><strong>BixoPDF is paid for once</strong>, and does the jobs that matter most for scanned documents: making them readable, searchable and easy to move through.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="faq">
+    <div class="wrap">
+      <div class="chap-head" style="margin-bottom:1.5rem"><span class="num" aria-hidden="true">?</span><h2>Questions</h2><p>Short answers to what people ask first.</p></div>
+      <div class="faq">
+        <details><summary>Does OCR need an internet connection?</summary><p>No. The recognizers are installed with the app and run on your computer. Your documents are not uploaded anywhere.</p></details>
+        <details><summary>Which Windows versions are supported?</summary><p>Windows 10 version 1809 or later, and Windows 11, on 64-bit PCs.</p></details>
+        <details><summary>Will my bookmarks and links work in other PDF readers?</summary><p>Yes. They are saved as standard PDF bookmarks and link annotations.</p></details>
+        <details><summary>What happens to text an older OCR program left in my PDF?</summary><p>If that text is hidden under the page image, BixoPDF replaces it with the new OCR text when you save. If the text is the visible content of the page, it asks you first.</p></details>
+        <details><summary>Can I make the app open my PDFs by default?</summary><p>Yes. In Windows Settings → Apps → Default apps, choose BixoPDF for .pdf files.</p></details>
+        <details><summary>Where do I buy it, and how do updates arrive?</summary><p>BixoPDF is sold on Microsoft Store. It is installed and kept up to date by the Store, on every Windows PC signed in with the same Microsoft account.</p></details>
+        <details><summary>How do I get help?</summary><p>Write to <a href="mailto:support@bixopdf.com">support@bixopdf.com</a>. The <a href="support.html">support page</a> lists what to include.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Bixo</span>
+    <nav aria-label="Footer">
+      <a href="https://apps.microsoft.com/search?query=BixoPDF">Buy</a>
+      <a href="#faq">Questions</a>
+      <a href="support.html">Support</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="THIRD-PARTY-NOTICES.txt">Open-source notices</a>
+    </nav>
+    <p class="tm">Microsoft, Windows and Microsoft Store are trademarks of the Microsoft group of companies. Google Chrome is a trademark of Google LLC.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.getElementById('stage');
+  var fixed = document.getElementById('fixed');
+  var split = document.getElementById('split');
+  function setSplit() { root.style.setProperty('--split', split.value + '%'); }
+  split.addEventListener('input', setSplit); setSplit();
+
+  var k = {
+    wght:  [document.getElementById('k-wght'),  document.getElementById('o-wght')],
+    sharp: [document.getElementById('k-sharp'), document.getElementById('o-sharp')],
+    con:   [document.getElementById('k-con'),   document.getElementById('o-con')],
+    bri:   [document.getElementById('k-bri'),   document.getElementById('o-bri')]
+  };
+  function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '0'; }
+  function apply() {
+    var w = +k.wght[0].value, s = +k.sharp[0].value, c = +k.con[0].value, b = +k.bri[0].value;
+    fixed.style.setProperty('--wght', Math.round(260 + w * 6));          // 260 (as scanned) … 860
+    fixed.style.setProperty('--blur', ((100 - s) / 100 * .8).toFixed(2) + 'px');
+    fixed.style.setProperty('--con', (1 + c / 100).toFixed(2));
+    fixed.style.setProperty('--bri', (.5 + b / 100 * 1).toFixed(2));
+    k.wght[1].value = signed(Math.round(w * 2 / 3));
+    k.sharp[1].value = s;
+    k.con[1].value = signed(c);
+    k.bri[1].value = signed(b - 50);
+  }
+  Object.keys(k).forEach(function (n) { k[n][0].addEventListener('input', apply); });
+  apply();
+})();
+</script>
+</body>
+</html>

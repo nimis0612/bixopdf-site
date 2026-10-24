@@ -1,0 +1,38 @@
+/* Shared look of the text pages (privacy, support, 404), from the home page's palette. */
+:root {
+  --paper: #f4f6f3; --sheet: #ffffff; --ink: #15202a; --ink-soft: #4a5761; --rule: #d5dcd6;
+  --accent: #0b7f73; --accent-ink: #ffffff;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1519; --sheet: #172027; --ink: #e5ebe7; --ink-soft: #a3b0b4; --rule: #2a363d;
+    --accent: #38c2b0; --accent-ink: #062521; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1519; --sheet: #172027; --ink: #e5ebe7; --ink-soft: #a3b0b4; --rule: #2a363d;
+  --accent: #38c2b0; --accent-ink: #062521; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1rem/1.65 var(--f-body); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+.top { border-bottom: 1px solid var(--rule); }
+.top .wrap, main, footer .wrap { max-width: 46rem; margin: 0 auto; padding: 0 16px; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .8rem; }
+.brand { display: flex; align-items: center; gap: .55rem; text-decoration: none; color: var(--ink); font: 700 1.1rem/1 var(--f-display); }
+.brand svg { width: 26px; height: 26px; }
+main { padding-block: 2.5rem 3rem; }
+h1 { font: 750 clamp(1.8rem, 1.4rem + 2vw, 2.6rem)/1.1 var(--f-display); margin: 0 0 .4rem; letter-spacing: -.015em; }
+h2 { font: 700 1.25rem/1.25 var(--f-display); margin: 2.2rem 0 .5rem; }
+.meta { color: var(--ink-soft); font-size: .9rem; margin: 0 0 2rem; }
+p, li { max-width: 68ch; }
+ul { padding-left: 1.2rem; }
+.box { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1.2rem; }
+code { font-size: .9em; background: var(--sheet); border: 1px solid var(--rule); border-radius: 5px; padding: .05em .35em; overflow-wrap: anywhere; }
+.btn { display: inline-block; padding: .65rem 1.05rem; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; text-decoration: none; }
+footer { border-top: 1px solid var(--rule); padding-block: 1.5rem 2.5rem; color: var(--ink-soft); font-size: .88rem; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: .6rem 1.4rem; }
+footer a { color: inherit; text-decoration: none; } footer a:hover { color: var(--ink); }
