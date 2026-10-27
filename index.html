@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BixoPDF</title>
-<meta name="description" content="A small, fast PDF editor for scanned documents: fix faint scans, OCR in many languages on your own PC, and build bookmarks and contents links automatically. $29 on Microsoft Store.">
+<meta name="description" content="A complete PDF editor with bookmarks, annotations and memos, plus what scans need: OCR in 35 languages on your own PC, scan enhancement, and bookmarks and links built from the contents page. $29 on Microsoft Store.">
 <meta name="naver-site-verification" content="c8dbab2af9d2878ce91f82f38f2d15165c487e68" />
 <link rel="canonical" href="https://www.bixopdf.com/">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -87,7 +87,10 @@ p { margin: 0; }
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); }
 .top .wrap { display: flex; align-items: center; gap: 1.5rem; padding-block: .8rem; }
 .brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; font: 700 1.15rem/1 var(--f-display); letter-spacing: -.02em; }
-.brand svg, .brand img { width: 28px; height: 28px; flex: none; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.brand img { width: 44px; height: 44px; flex: none; }
+.shot { margin: 0 0 clamp(1.8rem, 4vw, 2.6rem); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--sheet); box-shadow: var(--shadow); }
+.shot img { display: block; width: 100%; height: auto; }
 .brand small { font: 500 .72rem/1 var(--f-mono); color: var(--ink-soft); letter-spacing: .04em; }
 .top nav { display: flex; gap: 1.4rem; margin-left: auto; font-size: var(--step--1); }
 .top nav a { text-decoration: none; color: var(--ink-soft); }
@@ -333,11 +336,12 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="BixoPDF home">
-      <img src="favicon-192.png" width="28" height="28" alt="" aria-hidden="true">
+      <img src="brand-icon.png" width="44" height="44" alt="" aria-hidden="true">
       <span>BixoPDF</span>
     </a>
     <nav aria-label="Sections">
       <a href="#fast">Why it's fast</a>
+      <a href="#annotate">Mark up</a>
       <a href="#enhance">Scan fixing</a>
       <a href="#ocr">OCR</a>
       <a href="#bookmarks">Bookmarks</a>
@@ -354,7 +358,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
       <div>
         <p class="eyebrow">PDF editor for Windows</p>
         <h1 style="margin-top:.8rem">Scanned books, made <em>readable</em>, searchable and easy to move through.</h1>
-        <p class="lede">BixoPDF fixes faint scans, reads the text in many languages on your own PC, and turns a book's contents page into bookmarks and working links. It leaves out the rest, so it opens fast and stays out of your way.</p>
+        <p class="lede">A complete PDF editor — bookmarks, annotations and memos — with the tools scanned documents need: OCR that recognizes the text in 35 languages on your own PC, image enhancement and thicker strokes for faint pages, bookmarks and hyperlinks built from a book's contents page, and compression for big scans.</p>
         <div class="ctas">
           <a class="btn btn-primary" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM">Get it for $29</a>
           <a class="btn btn-ghost" href="#enhance">See what it fixes</a>
@@ -395,11 +399,12 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         <h2>Contents</h2>
         <ol class="toc">
           <li><a href="#fast"><span class="n">1</span><span class="t">Small, light and fast</span><span class="lead"></span><span class="p">1,000-page files open at once</span></a></li>
-          <li><a href="#enhance"><span class="n">2</span><span class="t">Fix a faint scan in seconds</span><span class="lead"></span><span class="p">thickness · sharpness · contrast</span></a></li>
-          <li><a href="#ocr"><span class="n">3</span><span class="t">OCR that we trained further ourselves</span><span class="lead"></span><span class="p">tested against leading programs</span></a></li>
-          <li><a href="#bookmarks"><span class="n">4</span><span class="t">Bookmarks and contents links, made for you</span><span class="lead"></span><span class="p">minutes, not days</span></a></li>
-          <li><a href="#compress"><span class="n">5</span><span class="t">Make big scans small</span><span class="lead"></span><span class="p">609 MB → 332 MB</span></a></li>
-          <li><a href="#price"><span class="n">6</span><span class="t">One price: $29</span><span class="lead"></span><span class="p">$29</span></a></li>
+          <li><a href="#annotate"><span class="n">2</span><span class="t">Bookmarks, annotations and memos</span><span class="lead"></span><span class="p">every page in reach</span></a></li>
+          <li><a href="#enhance"><span class="n">3</span><span class="t">Fix a faint scan in seconds</span><span class="lead"></span><span class="p">thickness · sharpness · contrast</span></a></li>
+          <li><a href="#ocr"><span class="n">4</span><span class="t">OCR that we trained further ourselves</span><span class="lead"></span><span class="p">tested against leading programs</span></a></li>
+          <li><a href="#bookmarks"><span class="n">5</span><span class="t">Bookmarks and contents links, made for you</span><span class="lead"></span><span class="p">minutes, not days</span></a></li>
+          <li><a href="#compress"><span class="n">6</span><span class="t">Make big scans small</span><span class="lead"></span><span class="p">609 MB → 332 MB</span></a></li>
+          <li><a href="#price"><span class="n">7</span><span class="t">One price: $29</span><span class="lead"></span><span class="p">$29</span></a></li>
         </ol>
         <p class="hint">Every line above is a link. BixoPDF does the same to the contents page of your PDF.</p>
       </nav>
@@ -412,7 +417,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
       <div class="chap-head">
         <span class="num">1</span>
         <h2>Small, light and fast</h2>
-        <p>Big PDF suites carry years of features most people never open. We kept what you do with documents every day and removed the rest, so the app starts quickly and pages turn without waiting, even in a file of thousands of pages.</p>
+        <p>Everything you do with documents every day, in an app that starts quickly and turns pages without waiting, even in a file of thousands of pages.</p>
       </div>
       <div class="cmp huge">
         <div class="cmp-example">
@@ -437,7 +442,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
           <h3>Kept</h3>
           <ul>
             <li>Read, search and copy text, even on scanned pages</li>
-            <li>Highlight, draw, write, stamp and sign</li>
+            <li>Bookmarks, highlights, drawings, memos, stamps and signatures</li>
             <li>Merge, split, crop, rotate and reorder pages</li>
             <li>OCR that runs on your own computer</li>
             <li>Bookmarks and contents links built automatically</li>
@@ -466,10 +471,35 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
   </section>
 
   <!-- 2 -->
-  <section class="chapter" id="enhance">
+  <section class="chapter" id="annotate">
     <div class="wrap">
       <div class="chap-head">
         <span class="num">2</span>
+        <h2>Bookmarks, annotations and memos</h2>
+        <p>Read and work through a book the way you would on paper: mark it up, leave notes for later, and get back to any page in a click from the bookmarks, the page thumbnails or the list of everything you marked.</p>
+      </div>
+      <figure class="shot">
+        <img src="annotate.png" width="1400" height="528" loading="lazy" alt="BixoPDF with the bookmark tree and page thumbnails on the left, a page with a highlight, an underline, a pen circle, a box, a memo and a text box, and the list of annotations on the right">
+      </figure>
+      <div class="tools">
+        <div><h3>Bookmarks</h3><p>Make bookmarks, drag them to change their order and level, and click one to go to its page.</p></div>
+        <div><h3>Mark up</h3><p>Highlight, underline, strike through, draw with a pen, add boxes, circles, lines and arrows.</p></div>
+        <div><h3>Memos and text boxes</h3><p>Leave a note on the page, or write straight on it; stamps and signatures too.</p></div>
+        <div><h3>Every annotation in a list</h3><p>All of them in one list, sorted by kind and page, with their text. Click one to go to it.</p></div>
+        <div><h3>Pages at a glance</h3><p>Thumbnails of every page, even in a book of thousands; jump to any page at once.</p></div>
+        <div><h3>Links that work</h3><p>Links to other pages go there; web addresses open in your browser, and only web and mail links are opened.</p></div>
+      </div>
+      <div class="note">
+        <p><b>Standard PDF.</b> Bookmarks, annotations and memos are saved as ordinary PDF bookmarks and annotations, so other PDF readers show them too.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="chapter" id="enhance">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">3</span>
         <h2>Fix a faint scan in seconds</h2>
         <p>Old photocopies and grey scans are tiring to read. Move a slider and the page changes on screen at once. When it looks right, apply it to one page, a range like <code>1-5</code>, or the whole book.</p>
       </div>
@@ -483,15 +513,16 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         <p><b>Before you commit.</b> The preview shows the page as it will be. Nothing is changed until you apply it.</p>
         <p><b>Page ranges.</b> Type <code>1,2,3</code> or <code>10-40</code> to apply the same settings to many pages at once.</p>
         <p><b>Also on the page.</b> Crop margins, split two-page spreads into single pages, and straighten tilted scans for OCR.</p>
+        <p><b>OCR text kept.</b> A page that already has OCR text keeps it when you save the adjusted page; on a straightened page the text is turned with it.</p>
       </div>
     </div>
   </section>
 
-  <!-- 3 -->
+  <!-- 4 -->
   <section class="chapter" id="ocr">
     <div class="wrap">
       <div class="chap-head">
-        <span class="num">3</span>
+        <span class="num">4</span>
         <h2>OCR that we trained further ourselves</h2>
         <p>We started from open-source recognizers and kept training them on our own data. On a scanned book in Korean BixoPDF made about a third of the errors of leading PDF program A and a fifth of program B's. On a book in English it matched the better of the two. It all runs on your PC, so your documents never go to a server.</p>
       </div>
@@ -557,18 +588,18 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
     </div>
   </section>
 
-  <!-- 4 -->
+  <!-- 5 -->
   <section class="chapter" id="bookmarks">
     <div class="wrap">
       <div class="chap-head">
-        <span class="num">4</span>
+        <span class="num">5</span>
         <h2>Bookmarks and contents links, made for you</h2>
         <p>A 1,000-page scan is only useful if you can get around it. BixoPDF reads the book's own contents pages and builds the bookmark tree and the links for you. You check it and correct the few lines it is unsure of.</p>
       </div>
       <div class="two" style="align-items:center">
         <ol class="steps">
           <li><div><h3>Point to the contents pages</h3><p>Pick them in the page list, for example pages 5–12.</p></div></li>
-          <li><div><h3>It reads every entry</h3><p>Title, level from the numbering, and printed page number. Printed pages are matched to PDF pages through an offset or the book's page labels, then checked against each page's text.</p></div></li>
+          <li><div><h3>It reads every entry</h3><p>Title, level from the numbering, and printed page number. Printed pages are matched to PDF pages through the page numbers printed at the head or foot of each page, the book's page labels or an offset, then checked against each page's text. Books numbered by paragraph (1.01, 2.30) work too.</p></div></li>
           <li><div><h3>Correct with a few clicks</h3><p>Doubtful lines are flagged. Change a level with + and −, fix a page number, include or skip a line.</p></div></li>
           <li><div><h3>Make bookmarks and links</h3><p>Each contents line becomes a link to its chapter. The links work in other PDF readers too, and running it again replaces the old links instead of stacking new ones.</p></div></li>
         </ol>
@@ -599,7 +630,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
 
       <h3 style="font-size:var(--step-1);margin:clamp(3rem,6vw,4.5rem) 0 1.2rem">And the everyday tools</h3>
       <div class="tools">
-        <div><h3>Annotate</h3><p>Highlight, underline, shapes, text boxes, memos, stamps and signatures.</p></div>
+        <div><h3>Text from scans</h3><p>Select, copy and search the OCR text in this app or any PDF reader; export it as plain text.</p></div>
         <div><h3>Pages</h3><p>Insert, delete, move, rotate, crop and split pages; set page labels like i, ii, 1, 2.</p></div>
         <div><h3>Merge</h3><p>Combine many PDFs and images into one file, from the app or Explorer's right-click menu.</p></div>
         <div><h3>Compress</h3><p>Shrink scans with black-and-white, grayscale, JPEG quality and resolution, with a size estimate first.</p></div>
@@ -609,11 +640,11 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
     </div>
   </section>
 
-  <!-- 5 -->
+  <!-- 6 -->
   <section class="chapter" id="compress">
     <div class="wrap">
       <div class="chap-head">
-        <span class="num">5</span>
+        <span class="num">6</span>
         <h2>Make big scans small</h2>
         <p>Scanned books run to hundreds of megabytes, too big to e-mail, upload to a court or client portal, or keep by the thousand. Choose how far to go, see the size and the page before you commit, and save a smaller copy.</p>
       </div>
@@ -642,11 +673,11 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
     </div>
   </section>
 
-  <!-- 6 -->
+  <!-- 7 -->
   <section class="chapter" id="price">
     <div class="wrap">
       <div class="chap-head">
-        <span class="num">6</span>
+        <span class="num">7</span>
         <h2>One price: $29</h2>
         <p>No tiers and no monthly bill. Every feature on this page is included.</p>
       </div>
@@ -655,7 +686,8 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
           <div class="amt"><sup>$</sup>29</div>
           <p class="per">BixoPDF · full version · Microsoft Store</p>
           <ul>
-            <li>Scan enhancement, OCR, bookmarks and links</li>
+            <li>Bookmarks, annotations and memos</li>
+            <li>Scan enhancement, OCR, automatic bookmarks and links</li>
             <li>All OCR languages included</li>
             <li>Runs offline, no account needed</li>
             <li>Windows 10 (1809+) and 11, 64-bit</li>
@@ -665,7 +697,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         </div>
         <div class="compare">
           <p>Most PDF suites are sold by subscription, and a year of one costs several times this price.</p>
-          <p><strong>BixoPDF is paid for once</strong>, and does the jobs that matter most for scanned documents: making them readable, searchable and easy to move through.</p>
+          <p><strong>BixoPDF is paid for once</strong>: a full PDF editor, with what scanned documents need — readable, searchable and easy to move through.</p>
         </div>
       </div>
     </div>
