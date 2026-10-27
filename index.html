@@ -87,7 +87,7 @@ p { margin: 0; }
 .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); }
 .top .wrap { display: flex; align-items: center; gap: 1.5rem; padding-block: .8rem; }
 .brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; font: 700 1.15rem/1 var(--f-display); letter-spacing: -.02em; }
-.brand svg { width: 28px; height: 28px; flex: none; }
+.brand svg, .brand img { width: 28px; height: 28px; flex: none; }
 .brand small { font: 500 .72rem/1 var(--f-mono); color: var(--ink-soft); letter-spacing: .04em; }
 .top nav { display: flex; gap: 1.4rem; margin-left: auto; font-size: var(--step--1); }
 .top nav a { text-decoration: none; color: var(--ink-soft); }
@@ -333,7 +333,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
 <header class="top">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="BixoPDF home">
-      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="2" width="20" height="24" rx="3" fill="var(--accent)"/><path d="M9 9h10M9 13h10M9 17h6" stroke="var(--accent-ink)" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="21" r="4.5" fill="var(--mark)" stroke="var(--paper)" stroke-width="1.5"/></svg>
+      <img src="favicon-192.png" width="28" height="28" alt="" aria-hidden="true">
       <span>BixoPDF</span>
     </a>
     <nav aria-label="Sections">

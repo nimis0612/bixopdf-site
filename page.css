@@ -23,7 +23,7 @@ a { color: var(--accent); }
 .top .wrap, main, footer .wrap { max-width: 46rem; margin: 0 auto; padding: 0 16px; }
 .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: .8rem; }
 .brand { display: flex; align-items: center; gap: .55rem; text-decoration: none; color: var(--ink); font: 700 1.1rem/1 var(--f-display); }
-.brand svg { width: 26px; height: 26px; }
+.brand svg, .brand img { width: 26px; height: 26px; }
 main { padding-block: 2.5rem 3rem; }
 h1 { font: 750 clamp(1.8rem, 1.4rem + 2vw, 2.6rem)/1.1 var(--f-display); margin: 0 0 .4rem; letter-spacing: -.015em; }
 h2 { font: 700 1.25rem/1.25 var(--f-display); margin: 2.2rem 0 .5rem; }
