@@ -91,6 +91,7 @@ p { margin: 0; }
 .brand img { width: 44px; height: 44px; flex: none; }
 .shot { margin: 0 0 clamp(1.8rem, 4vw, 2.6rem); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--sheet); box-shadow: var(--shadow); }
 .shot img { display: block; width: 100%; height: auto; }
+.shot figcaption { padding: .6rem 1rem .7rem; font-size: var(--step--1); color: var(--ink-soft); border-top: 1px solid var(--rule); }
 .brand small { font: 500 .72rem/1 var(--f-mono); color: var(--ink-soft); letter-spacing: .04em; }
 .top nav { display: flex; gap: 1.4rem; margin-left: auto; font-size: var(--step--1); }
 .top nav a { text-decoration: none; color: var(--ink-soft); }
@@ -437,6 +438,10 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
           <div class="opt"><h3>Light on memory</h3><p>Pages are drawn by PDFium, the open-source engine inside Google Chrome. It reads only what it shows, so even a huge scan leaves room for the rest of your work.</p></div>
         </div>
       </div>
+      <figure class="shot">
+        <img src="shot-viewer.webp" width="1600" height="875" loading="lazy" alt="The BixoPDF window in the dark green theme: tabs, a compact toolbar, a scanned page and the side buttons for search, files, OCR, contents, image adjustment, crop, split and compression">
+        <figcaption>One window, a tab for each document. The tools you use most are one click away; the rest wait in the side bar.</figcaption>
+      </figure>
       <div class="two">
         <div class="ledger keep">
           <h3>Kept</h3>
@@ -509,6 +514,10 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         <div class="knob"><div class="sample"><span style="opacity:.45">Aa</span><b>→</b><span>Aa</span></div><h3>Contrast</h3><p class="muted">Grey text on grey paper becomes black on white.</p></div>
         <div class="knob"><div class="sample"><span style="opacity:.7;background:var(--scan-bg);padding:0 .15em;border-radius:3px">Aa</span><b>→</b><span>Aa</span></div><h3>Brightness</h3><p class="muted">Yellowed or dark pages become clean paper.</p></div>
       </div>
+      <figure class="shot">
+        <img src="shot-adjust.webp" width="1600" height="875" loading="lazy" alt="The Image Adjust panel beside a scanned page made darker and sharper: auto level, straighten, brightness, contrast, thicken strokes, unsharp mask and buttons to apply to all, odd, even or a range of pages">
+        <figcaption>Image Adjust: the page on the left changes as you move the sliders. Apply to all pages, odd or even pages, or a range.</figcaption>
+      </figure>
       <div class="note">
         <p><b>Before you commit.</b> The preview shows the page as it will be. Nothing is changed until you apply it.</p>
         <p><b>Page ranges.</b> Type <code>1,2,3</code> or <code>10-40</code> to apply the same settings to many pages at once.</p>
@@ -554,6 +563,10 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         <p class="vs-method"><b>How we tested.</b> Pages of born-digital PDFs were turned into 300-dpi greyscale scans with slight tilt, blur, noise and JPEG compression, saved as image-only PDFs, and given to each program's OCR on the same PC in October 2026. Each result's text layer was read the same way and compared with the source text, spaces left out. Neither book was used to train our recognizers. Programs A and B are two widely used commercial PDF editors with built-in OCR, at the versions installed on the test PC.</p>
         <p class="vs-disclaimer"><b>Disclaimer.</b> These results come from tests run in a limited environment on a limited set of documents. They do not mean that the same results will be obtained in every environment or with every document. Accuracy depends on the scan, the layout, the fonts, the language and the settings used, and your results may differ.</p>
       </div>
+      <figure class="shot">
+        <img src="shot-ocr.webp" width="1600" height="875" loading="lazy" alt="The OCR panel after recognizing a page: each recognized line boxed in colour on the page and listed with its confidence on the right">
+        <figcaption>OCR panel: every line it read is boxed on the page and listed beside it, so you can check the result before you save.</figcaption>
+      </figure>
       <div class="ocr-grid">
         <div class="scripts">
           <div class="script"><div class="glyph">Aé ß</div><div><h3>Latin script <span class="muted" style="font-weight:400">· default</span></h3>
@@ -628,6 +641,10 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         </div>
       </div>
 
+      <figure class="shot" style="margin-top:clamp(2rem,5vw,3rem)">
+        <img src="shot-contents.webp" width="1600" height="722" loading="lazy" alt="The contents window: the contents page with each entry boxed and numbered by level on the left, and the list of entries with level, title, printed page and PDF page on the right">
+        <figcaption>The contents window: entries read from the contents page, their levels and pages matched. Correct a line, then make bookmarks and links.</figcaption>
+      </figure>
       <h3 style="font-size:var(--step-1);margin:clamp(3rem,6vw,4.5rem) 0 1.2rem">And the everyday tools</h3>
       <div class="tools">
         <div><h3>Text from scans</h3><p>Select, copy and search the OCR text in this app or any PDF reader; export it as plain text.</p></div>
