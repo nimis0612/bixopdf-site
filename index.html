@@ -313,6 +313,8 @@ section.chapter { padding-block: clamp(3rem, 7vw, 6rem); border-top: 1px solid v
 .ticket ul { list-style: none; padding: 0; margin: 1.4rem 0 1.6rem; display: grid; gap: .45rem; font-size: var(--step--1); }
 .ticket li::before { content: "✓"; margin-right: .6rem; color: var(--mark); }
 .ticket .btn-primary { background: var(--mark); color: var(--mark-ink); }
+.ticket .bulk { margin-top: 1.1rem; font-size: var(--step--1); opacity: .85; }
+.ticket .bulk a { color: inherit; text-decoration: underline; text-underline-offset: .15em; }
 .ticket::after { content: ""; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; border: 28px solid color-mix(in srgb, var(--paper) 10%, transparent); }
 .compare p { font-size: var(--step-1); line-height: 1.55; color: var(--ink-soft); }
 .compare p + p { margin-top: 1rem; }
@@ -711,6 +713,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
             <li>Updates through Microsoft Store</li>
           </ul>
           <a class="btn btn-primary" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM">Get it from Microsoft Store</a>
+          <p class="bulk">Buying many licenses for a company or an organization? Write to us directly at <a href="mailto:support@bixopdf.com">support@bixopdf.com</a>.</p>
         </div>
         <div class="compare">
           <p>Most PDF suites are sold by subscription, and a year of one costs several times this price.</p>
@@ -730,6 +733,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         <details><summary>What happens to text an older OCR program left in my PDF?</summary><p>If that text is hidden under the page image, BixoPDF replaces it with the new OCR text when you save. If the text is the visible content of the page, it asks you first.</p></details>
         <details><summary>Can I make the app open my PDFs by default?</summary><p>Yes. In Windows Settings → Apps → Default apps, choose BixoPDF for .pdf files.</p></details>
         <details><summary>Where do I buy it, and how do updates arrive?</summary><p>BixoPDF is sold on Microsoft Store. It is installed and kept up to date by the Store, on every Windows PC signed in with the same Microsoft account.</p></details>
+        <details><summary>Can I buy licenses in bulk?</summary><p>Yes. For volume purchases for a company, a law firm or an organization, write to <a href="mailto:support@bixopdf.com">support@bixopdf.com</a> and tell us how many PCs it is for.</p></details>
         <details><summary>How do I get help?</summary><p>Write to <a href="mailto:support@bixopdf.com">support@bixopdf.com</a>. The <a href="support.html">support page</a> lists what to include.</p></details>
       </div>
     </div>
