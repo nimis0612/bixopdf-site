@@ -6,55 +6,47 @@ only; BixoPDF itself is licensed separately.
 
 SOFTWARE
 
- 1. PDFsharp 6.2.4
-    PDF reading, editing and writing
-    Copyright (c) 2001-2026 empira Software GmbH, Troisdorf (Cologne Area), Germany
-    License: MIT License  -  https://github.com/empira/PDFsharp
- 2. PDFium 158.0.8111 (chromium/8111)
+ 1. PDFium 158.0.8111 (chromium/8111)
     drawing the pages (pdfium.dll, built by bblanchon/pdfium-binaries)
     Copyright 2014 The PDFium Authors
     License: BSD 3-Clause License and Apache License 2.0  -  https://pdfium.googlesource.com/pdfium/
- 3. pdfium-binaries chromium/8111
+ 2. pdfium-binaries chromium/8111
     the build of pdfium.dll
     Copyright 2014-2025 Benoit Blanchon
     License: MIT License  -  https://github.com/bblanchon/pdfium-binaries
- 4. PdfPig 0.1.16
-    PDF text extraction
-    Copyright (c) UglyToad and PdfPig contributors
-    License: Apache License 2.0  -  https://github.com/UglyToad/PdfPig
- 5. ONNX Runtime 1.31.0
+ 3. ONNX Runtime 1.31.0
     running the OCR models (onnxruntime.dll, Microsoft.ML.OnnxRuntime.dll)
     Copyright (c) Microsoft Corporation
     License: MIT License  -  https://github.com/microsoft/onnxruntime
- 6. RapidOcrNet 4.2.0
+ 4. RapidOcrNet 4.2.0
     OCR pipeline (text detection and recognition)
     Copyright (c) BobLd and RapidOcrNet contributors
     License: Apache License 2.0  -  https://github.com/BobLd/RapidOcrNet
- 7. SkiaSharp 3.119.1
+ 5. SkiaSharp 3.119.1
     image processing (SkiaSharp.dll, libSkiaSharp.dll)
     Copyright (c) 2015-2016 Xamarin, Inc.; Copyright (c) 2017-2018 Microsoft Corporation
     License: MIT License  -  https://github.com/mono/SkiaSharp
- 8. LibTiff.Net 2.4.660
+ 6. LibTiff.Net 2.4.660
     CCITT Group 4 compression (black-and-white images)
     Copyright (c) 2008-2023 Bit Miracle
     License: BSD 3-Clause License  -  https://github.com/BitMiracle/libtiff.net
- 9. Clipper2 2.0.0
+ 7. Clipper2 2.0.0
     polygon offsetting (used by RapidOcrNet)
     Copyright (c) 2010-2025 Angus Johnson
     License: Boost Software License 1.0  -  https://github.com/AngusJohnson/Clipper2
-10. Microsoft.Extensions.DependencyInjection.Abstractions, .Logging.Abstractions 8.0
-    used by PDFsharp
-    Copyright (c) .NET Foundation and Contributors
-    License: MIT License  -  https://github.com/dotnet/runtime
-11. System.Numerics.Tensors 9.0.0
+ 8. System.Numerics.Tensors 9.0.0
     used by ONNX Runtime
     Copyright (c) .NET Foundation and Contributors
     License: MIT License  -  https://github.com/dotnet/runtime
-12. C#/WinRT runtime (WinRT.Runtime.dll)
+ 9. Material Symbols
+    the menu and tool icons (Resources\Icons)
+    Copyright Google LLC
+    License: Apache License 2.0  -  https://github.com/google/material-design-icons
+10. C#/WinRT runtime (WinRT.Runtime.dll)
     Windows APIs from .NET
     Copyright (c) Microsoft Corporation
     License: MIT License  -  https://github.com/microsoft/CsWinRT
-13. Windows SDK projection for .NET (Microsoft.Windows.SDK.NET.dll) 10.0.19041
+11. Windows SDK projection for .NET (Microsoft.Windows.SDK.NET.dll) 10.0.19041
     Windows APIs from .NET
     Copyright (c) Microsoft Corporation
     License: Microsoft Software License Terms (Windows SDK)  -  https://aka.ms/WinSDKLicenseURL
@@ -62,7 +54,7 @@ SOFTWARE
 MODELS (OCR)
 
  1. PaddleOCR models
-    text detection PP-OCRv6 medium and PP-OCRv5 mobile; recognition PP-OCRv6 small (Chinese, Japanese), PP-OCRv5 mobile Latin and Arabic; text-line orientation; their character dictionaries
+    text detection PP-OCRv6 medium and PP-OCRv5 mobile; recognition PP-OCRv6 small (Chinese, Japanese), PP-OCRv5 mobile Latin, Arabic, Cyrillic and Devanagari; text-line orientation; their character dictionaries
     Copyright (c) PaddlePaddle Authors
     License: Apache License 2.0  -  https://github.com/PaddlePaddle/PaddleOCR
  2. Korean recognition model (models\kh)
@@ -76,33 +68,6 @@ MODELS (OCR)
 
 
 LICENSE TEXTS
-
-==============================================================================
-PDFsharp 6.2.4  -  MIT License
-==============================================================================
-Copyright (c) 2001-2026 empira Software GmbH, Troisdorf (Cologne Area), Germany
-
-http://docs.pdfsharp.net
-
-MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-DEALINGS IN THE SOFTWARE.
 
 ==============================================================================
 PDFium 158.0.8111 (chromium/8111)  -  BSD 3-Clause License and Apache License 2.0
@@ -508,33 +473,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
 ==============================================================================
-Microsoft.Extensions.DependencyInjection.Abstractions, .Logging.Abstractions 8.0  -  MIT License
-==============================================================================
-The MIT License (MIT)
-
-Copyright (c) .NET Foundation and Contributors
-
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-==============================================================================
 System.Numerics.Tensors 9.0.0  -  MIT License
 ==============================================================================
 The MIT License (MIT)
@@ -592,10 +530,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ==============================================================================
-Apache License 2.0  -  PdfPig, RapidOcrNet, PaddleOCR models, Korean recognition model (models\kh), RapidOCR ONNX conversions
+Apache License 2.0  -  RapidOcrNet, Material Symbols, PaddleOCR models, Korean recognition model (models\kh), RapidOCR ONNX conversions
 ==============================================================================
-Copyright (c) UglyToad and PdfPig contributors
 Copyright (c) BobLd and RapidOcrNet contributors
+Copyright Google LLC
 Copyright (c) PaddlePaddle Authors
 Copyright (c) PaddlePaddle Authors; modifications by the makers of BixoPDF
 Copyright (c) 2021 RapidOCR Authors
