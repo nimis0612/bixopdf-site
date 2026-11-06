@@ -38,15 +38,43 @@ SOFTWARE
     used by ONNX Runtime
     Copyright (c) .NET Foundation and Contributors
     License: MIT License  -  https://github.com/dotnet/runtime
- 9. Material Symbols
+ 9. Microsoft.Data.Sqlite 10.0.14
+    reading the dictionary packs (Microsoft.Data.Sqlite.dll)
+    Copyright (c) .NET Foundation and Contributors
+    License: MIT License  -  https://github.com/dotnet/efcore
+10. SQLitePCLRaw 2.1.13
+    SQLite for .NET (SQLitePCLRaw.*.dll, e_sqlite3.dll)
+    Copyright 2014-2024 SourceGear, LLC
+    License: Apache License 2.0  -  https://github.com/ericsink/SQLitePCL.raw
+11. SQLite 3 (in e_sqlite3.dll)
+    the database engine of the dictionary packs
+    Public domain (D. Richard Hipp and the SQLite developers)
+    License: Public domain  -  https://www.sqlite.org/copyright.html
+12. Dictionary packs: Basic Korean Dictionary, Wiktionary, JMdict, CC-CEDICT, wordfreq 2026-11-03
+    the dictionary (downloaded separately; sources listed in each pack and at github.com/nimis0612/bixopdf-dict)
+    National Institute of Korean Language; Wiktionary contributors; Electronic Dictionary Research and Development Group; MDBG; Robyn Speer
+    License: CC BY-SA 4.0 (Basic Korean Dictionary: CC BY-SA 2.0 KR)  -  https://creativecommons.org/licenses/by-sa/4.0/
+13. Japanese WordNet 2.1
+    the dictionary packs (Japanese senses)
+    Copyright 2009-2026 NICT, Francis Bond, Takayuki Kuribayashi
+    License: WordNet licence (NICT)  -  https://bond-lab.github.io/wnja/
+14. Princeton WordNet (Open Multilingual Wordnet 2.0) 3.0
+    the dictionary packs (English senses)
+    Copyright 2006 by Princeton University
+    License: WordNet 3.0 licence  -  https://github.com/omwn/omw-data
+15. Chinese Open WordNet (Open Multilingual Wordnet 2.0)
+    the dictionary packs (Chinese senses)
+    Copyright 2013, 2014 Francis Bond, Shan Wang
+    License: WordNet licence  -  https://github.com/omwn/omw-data
+16. Material Symbols
     the menu and tool icons (Resources\Icons)
     Copyright Google LLC
     License: Apache License 2.0  -  https://github.com/google/material-design-icons
-10. C#/WinRT runtime (WinRT.Runtime.dll)
+17. C#/WinRT runtime (WinRT.Runtime.dll)
     Windows APIs from .NET
     Copyright (c) Microsoft Corporation
     License: MIT License  -  https://github.com/microsoft/CsWinRT
-11. Windows SDK projection for .NET (Microsoft.Windows.SDK.NET.dll) 10.0.19041
+18. Windows SDK projection for .NET (Microsoft.Windows.SDK.NET.dll) 10.0.19041
     Windows APIs from .NET
     Copyright (c) Microsoft Corporation
     License: Microsoft Software License Terms (Windows SDK)  -  https://aka.ms/WinSDKLicenseURL
@@ -500,6 +528,161 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ==============================================================================
+Microsoft.Data.Sqlite 10.0.14  -  MIT License
+==============================================================================
+The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+==============================================================================
+SQLite 3 (in e_sqlite3.dll)  -  Public domain
+==============================================================================
+The author disclaims copyright to this source code. In place of a legal notice, here is a blessing:
+
+    May you do good and not evil.
+    May you find forgiveness for yourself and forgive others.
+    May you share freely, never taking more than you give.
+
+==============================================================================
+Dictionary packs: Basic Korean Dictionary, Wiktionary, JMdict, CC-CEDICT, wordfreq 2026-11-03  -  CC BY-SA 4.0 (Basic Korean Dictionary: CC BY-SA 2.0 KR)
+==============================================================================
+The dictionary packs are licensed under the Creative Commons Attribution-ShareAlike 4.0 International licence
+(https://creativecommons.org/licenses/by-sa/4.0/legalcode). This publication has included material from the JMdict
+(EDICT, etc.) dictionary files in accordance with the licence provisions of the Electronic Dictionaries Research
+Group. See http://www.edrdg.org/.
+
+==============================================================================
+Japanese WordNet 2.1  -  WordNet licence (NICT)
+==============================================================================
+Copyright: 2021-2026 Francis Bond, Takayuki Kuribayashi
+Copyright: 2018-2020 Francis Bond	   
+Copyright: 2016-2017 Francis Bond, Takayuki Kuribayashi
+Copyright: 2012-2015 Francis Bond	   
+Copyright: 2009-2011 NICT
+
+
+
+Japanese WordNet
+
+This software and database is being provided to you, the LICENSEE, by
+the National Institute of Information and Communications Technology
+under the following license.  By obtaining, using and/or copying this
+software and database, you agree that you have read, understood, and
+will comply with these terms and conditions:
+  
+  Permission to use, copy, modify and distribute this software and
+  database and its documentation for any purpose and without fee or
+  royalty is hereby granted, provided that you agree to comply with
+  the following copyright notice and statements, including the
+  disclaimer, and that the same appear on ALL copies of the software,
+  database and documentation, including modifications that you make
+  for internal use or for distribution.
+  
+ 
+THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND NICT MAKES NO
+REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  BY WAY OF EXAMPLE,
+BUT NOT LIMITATION, NICT MAKES NO REPRESENTATIONS OR WARRANTIES OF
+MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE
+OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT INFRINGE
+ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+  
+The name of the National Institute of Information and Communications
+Technology may not be used in advertising or publicity pertaining to
+distribution of the software and/or database.  Title to copyright in
+this software, database and any associated documentation shall at all
+times remain with National Institute of Information and Communications
+Technology and LICENSEE agrees to preserve same.
+
+==============================================================================
+Princeton WordNet (Open Multilingual Wordnet 2.0) 3.0  -  WordNet 3.0 licence
+==============================================================================
+WordNet Release 3.0
+
+This software and database is being provided to you, the LICENSEE, by  
+Princeton University under the following license.  By obtaining, using  
+and/or copying this software and database, you agree that you have  
+read, understood, and will comply with these terms and conditions.:  
+  
+Permission to use, copy, modify and distribute this software and  
+database and its documentation for any purpose and without fee or  
+royalty is hereby granted, provided that you agree to comply with  
+the following copyright notice and statements, including the disclaimer,  
+and that the same appear on ALL copies of the software, database and  
+documentation, including modifications that you make for internal  
+use or for distribution.  
+  
+WordNet 3.0 Copyright 2006 by Princeton University.  All rights reserved.  
+  
+THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND PRINCETON  
+UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR  
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON  
+UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF MERCHANT-  
+ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE  
+OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT  
+INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR  
+OTHER RIGHTS.  
+  
+The name of Princeton University or Princeton may not be used in  
+advertising or publicity pertaining to distribution of the software  
+and/or database.  Title to copyright in this software, database and  
+any associated documentation shall at all times remain with  
+Princeton University and LICENSEE agrees to preserve same.  
+
+==============================================================================
+Chinese Open WordNet (Open Multilingual Wordnet 2.0)  -  WordNet licence
+==============================================================================
+Copyright: 2013, 2014 Francis Bond, Shan Wang
+
+Chinese Open WordNet
+
+This software and database is being provided to you, the LICENSEE
+under the following license.  By obtaining, using and/or copying this
+software and database, you agree that you have read, understood, and
+will comply with these terms and conditions:
+  
+  Permission to use, copy, modify and distribute this software and
+  database and its documentation for any purpose and without fee or
+  royalty is hereby granted, provided that you agree to comply with
+  the following copyright notice and statements, including the
+  disclaimer, and that the same appear on ALL copies of the software,
+  database and documentation, including modifications that you make
+  for internal use or for distribution.
+  
+Chinese Open Wordnet Copyright 2013,2014 by Francis Bond and Shan
+Wang.  All rights reserved.
+  
+THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND WE MAKE NO
+REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  BY WAY OF EXAMPLE,
+BUT NOT LIMITATION, WE MAKE NO REPRESENTATIONS OR WARRANTIES OF
+MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE
+OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT INFRINGE
+ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+  
+Title to copyright in this software, database and any associated
+documentation shall at all times remain with the copyright holders and
+LICENSEE agrees to preserve same.
+
+==============================================================================
 Windows SDK projection for .NET (Microsoft.Windows.SDK.NET.dll) 10.0.19041  -  Microsoft Software License Terms (Windows SDK)
 ==============================================================================
 Redistributed under the Microsoft Software License Terms for the Windows SDK: https://aka.ms/WinSDKLicenseURL
@@ -530,9 +713,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ==============================================================================
-Apache License 2.0  -  RapidOcrNet, Material Symbols, PaddleOCR models, Korean recognition model (models\kh), RapidOCR ONNX conversions
+Apache License 2.0  -  RapidOcrNet, SQLitePCLRaw, Material Symbols, PaddleOCR models, Korean recognition model (models\kh), RapidOCR ONNX conversions
 ==============================================================================
 Copyright (c) BobLd and RapidOcrNet contributors
+Copyright 2014-2024 SourceGear, LLC
 Copyright Google LLC
 Copyright (c) PaddlePaddle Authors
 Copyright (c) PaddlePaddle Authors; modifications by the makers of BixoPDF
