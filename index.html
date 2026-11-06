@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>BixoPDF</title>
-<meta name="description" content="A complete PDF editor with bookmarks, annotations and memos, plus what scans need: OCR in 50 languages on your own PC, scan enhancement, bookmarks and links built from the contents page, and a dictionary in seven languages. $29 on Microsoft Store.">
+<meta name="description" content="A complete PDF editor with bookmarks, annotations and memos, plus what scans need: OCR in 50 languages on your own PC, scan enhancement, bookmarks and links built from the contents page, and a dictionary in seven languages. $29 on Microsoft Store, with a 15-day free trial.">
 <meta name="naver-site-verification" content="c8dbab2af9d2878ce91f82f38f2d15165c487e68" />
 <link rel="canonical" href="https://www.bixopdf.com/">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -319,6 +319,14 @@ section.chapter { padding-block: clamp(3rem, 7vw, 6rem); border-top: 1px solid v
 .compare p { font-size: var(--step-1); line-height: 1.55; color: var(--ink-soft); }
 .compare p + p { margin-top: 1rem; }
 .compare strong { color: var(--ink); }
+.trial { margin-top: clamp(2rem, 5vw, 3rem); border: 1px solid var(--rule); border-radius: 18px; background: var(--sheet); padding: clamp(1.4rem, 3.5vw, 2.2rem); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.2rem, 4vw, 2.6rem); align-items: start; }
+.trial h3 { font-size: var(--step-1); margin-bottom: .5rem; }
+.trial p { color: var(--ink-soft); }
+.trial .btn { margin-top: 1.1rem; }
+.trial .file { margin-top: .7rem; font: 500 .78rem/1.5 var(--f-mono); color: var(--ink-soft); overflow-wrap: anywhere; }
+.trial ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .5rem; font-size: var(--step--1); color: var(--ink-soft); }
+.trial ul b { color: var(--ink); font-weight: 600; }
+@media (max-width: 760px) { .trial { grid-template-columns: minmax(0, 1fr); } }
 
 /* FAQ */
 .faq { display: grid; gap: .7rem; }
@@ -365,9 +373,9 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
         <p class="lede">A complete PDF editor — bookmarks, annotations and memos — with the tools scanned documents need: OCR that recognizes the text in 50 languages on your own PC, image enhancement and thicker strokes for faint pages, bookmarks and hyperlinks built from a book's contents page, compression for big scans, and a dictionary in seven languages for any word on the page.</p>
         <div class="ctas">
           <a class="btn btn-primary" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM">Get it for $29</a>
-          <a class="btn btn-ghost" href="#enhance">See what it fixes</a>
+          <a class="btn btn-ghost" href="#trial">Try it free for 15 days</a>
         </div>
-        <p class="fine">Windows 10 (1809+) and 11 · 64-bit · No account, no subscription</p>
+        <p class="fine">Windows 10 (1809+) and 11 · 64-bit · No account, no subscription · 15-day free trial</p>
       </div>
 
       <figure class="scan" style="margin:0" aria-label="Interactive example: a faint scanned page, before and after adjustment">
@@ -763,6 +771,20 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
           <p><strong>BixoPDF is paid for once</strong>: a full PDF editor, with what scanned documents need — readable, searchable and easy to move through.</p>
         </div>
       </div>
+      <div class="trial" id="trial">
+        <div>
+          <h3>Try it free for 15 days</h3>
+          <p>The trial version is the full app: every feature on this page, with no watermark and no limits, for 15 days from the day you install it.</p>
+          <a class="btn btn-primary" href="https://github.com/nimis0612/bixopdf-site/releases/latest/download/BixoPDF-Trial-Setup.exe">Download the free trial</a>
+          <p class="file">BixoPDF-Trial-Setup.exe · version 1.3.6 · 163 MB · Windows 10 (1809+) and 11, 64-bit<br>SHA-256 1482c83822dd8140e00220454c590f02296d60509cc3797514841fa070f94ac9</p>
+        </div>
+        <ul>
+          <li><b>One trial per PC.</b> Removing the app and installing it again does not start a new trial, and neither does setting the clock back.</li>
+          <li><b>After 15 days</b> the trial no longer opens documents and shows where to get the full version. Your PDFs and settings are left as they were.</li>
+          <li><b>To keep using BixoPDF</b>, get it from Microsoft Store; it is installed alongside, so remove the trial in Windows Settings → Apps.</li>
+          <li><b>Windows may warn you.</b> The trial setup is not code-signed yet, so Windows SmartScreen may show “Windows protected your PC”. Choose <i>More info</i>, then <i>Run anyway</i>. The Store version is checked by Microsoft and shows no warning.</li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -770,6 +792,7 @@ footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
     <div class="wrap">
       <div class="chap-head" style="margin-bottom:1.5rem"><span class="num" aria-hidden="true">?</span><h2>Questions</h2><p>Short answers to what people ask first.</p></div>
       <div class="faq">
+        <details><summary>Can I try it before buying?</summary><p>Yes. The <a href="#trial">free trial</a> is the full app for 15 days. One trial is given per PC: reinstalling does not start it again. After that, the full version is on Microsoft Store.</p></details>
         <details><summary>Does OCR need an internet connection?</summary><p>No. The recognizers are installed with the app and run on your computer. Your documents are not uploaded anywhere.</p></details>
         <details><summary>Does the dictionary need an internet connection?</summary><p>Only to download a language pack, once, when you ask for it in the Dictionary panel; packs are free. Look-ups then run on your PC, and the words you look up are never sent. The <a href="privacy.html">privacy policy</a> explains the download.</p></details>
         <details><summary>Can I keep working while OCR runs?</summary><p>Yes. OCR runs in the background, so you can open other PDFs in new tabs, read them, add highlights and memos and save them while a long scan is being recognized. OCR uses a lot of memory, though: on a PC with limited memory, opening a very large PDF or running OCR on several files at the same time while OCR is running can make the app stop working. Save your work first, and let one OCR job finish before starting the next.</p></details>
