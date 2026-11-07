@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.bixopdf.com/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://www.bixopdf.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bixopdf.com/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.bixopdf.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.bixopdf.com/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.bixopdf.com/hi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.bixopdf.com/"/></url>
+  <url><loc>https://www.bixopdf.com/ko/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bixopdf.com/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.bixopdf.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.bixopdf.com/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.bixopdf.com/hi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.bixopdf.com/"/></url>
+  <url><loc>https://www.bixopdf.com/ar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bixopdf.com/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.bixopdf.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.bixopdf.com/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.bixopdf.com/hi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.bixopdf.com/"/></url>
+  <url><loc>https://www.bixopdf.com/hi/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bixopdf.com/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://www.bixopdf.com/ko/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://www.bixopdf.com/ar/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.bixopdf.com/hi/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.bixopdf.com/"/></url>
+  <url><loc>https://www.bixopdf.com/acrobat-alternative.html</loc></url>
+  <url><loc>https://www.bixopdf.com/korean-ocr-pdf.html</loc></url>
+  <url><loc>https://www.bixopdf.com/arabic-ocr-pdf.html</loc></url>
+  <url><loc>https://www.bixopdf.com/hindi-ocr-pdf.html</loc></url>
+  <url><loc>https://www.bixopdf.com/press.html</loc></url>
   <url><loc>https://www.bixopdf.com/support.html</loc></url>
   <url><loc>https://www.bixopdf.com/privacy.html</loc></url>
 </urlset>
