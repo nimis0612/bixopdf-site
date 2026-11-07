@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BixoPDF</title>
+<meta name="description" content="しおり・注釈・メモをそろえたPDF編集ソフトに、スキャン文書に必要な機能を加えました。PC上で動く50言語対応のOCR、スキャン画像の補正、目次ページから作るしおりとリンク、7言語の辞書。Microsoft Storeで$29、15日間の無料体験版あり。">
+<meta name="naver-site-verification" content="c8dbab2af9d2878ce91f82f38f2d15165c487e68" />
+<link rel="canonical" href="https://www.bixopdf.com/ja/">
+<link rel="alternate" hreflang="en" href="https://www.bixopdf.com/">
+<link rel="alternate" hreflang="ko" href="https://www.bixopdf.com/ko/">
+<link rel="alternate" hreflang="ja" href="https://www.bixopdf.com/ja/">
+<link rel="alternate" hreflang="ru" href="https://www.bixopdf.com/ru/">
+<link rel="alternate" hreflang="ar" href="https://www.bixopdf.com/ar/">
+<link rel="alternate" hreflang="hi" href="https://www.bixopdf.com/hi/">
+<link rel="alternate" hreflang="x-default" href="https://www.bixopdf.com/">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../favicon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BixoPDF — スキャン文書を読みやすく">
+<meta property="og:description" content="Windows用の小さくて速いPDF編集ソフト。薄いスキャンの補正、PC上で動くOCR、目次ページから作るしおり。$29。">
+<meta property="og:url" content="https://www.bixopdf.com/ja/">
+<meta property="og:image" content="https://www.bixopdf.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,200..900&display=swap">
+<style>
+/* Layout: a scanned book's own furniture — a contents page with dot leaders as the navigation,
+   numbered sections, and a live "before / after" scan as the opening. Paper-white with ink, one
+   scanner-teal accent and a highlighter yellow kept for OCR marks. */
+:root {
+  --paper: #f4f6f3;
+  --sheet: #ffffff;
+  --ink: #15202a;
+  --ink-soft: #4a5761;
+  --rule: #d5dcd6;
+  --accent: #0b7f73;
+  --accent-ink: #ffffff;
+  --mark: #f3dd4a;
+  --mark-ink: #15202a;
+  --scan-bg: #e9e6dc;
+  --scan-ink: #5e5a52;
+  --scan-fixed: #17150f;
+  --shadow: 0 1px 2px rgba(21,32,42,.06), 0 8px 28px rgba(21,32,42,.08);
+
+  --f-display: "Bricolage Grotesque", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Noto Sans JP", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --f-book: "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  --step--1: clamp(.82rem, .8rem + .1vw, .88rem);
+  --step-0: clamp(1rem, .96rem + .2vw, 1.08rem);
+  --step-1: clamp(1.2rem, 1.1rem + .5vw, 1.45rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+  --step-3: clamp(2.1rem, 1.6rem + 2.4vw, 3.6rem);
+  --wrap: 72rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1519; --sheet: #172027; --ink: #e5ebe7; --ink-soft: #a3b0b4; --rule: #2a363d;
+    --accent: #38c2b0; --accent-ink: #062521; --mark: #e2cf4a; --mark-ink: #15202a;
+    --scan-bg: #d9d5c9; --scan-ink: #5e5a52;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1519; --sheet: #172027; --ink: #e5ebe7; --ink-soft: #a3b0b4; --rule: #2a363d;
+  --accent: #38c2b0; --accent-ink: #062521; --mark: #e2cf4a; --mark-ink: #15202a;
+  --scan-bg: #d9d5c9; --scan-ink: #5e5a52;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 var(--step-0)/1.6 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+  line-break: strict;
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.08; letter-spacing: -.015em; text-wrap: balance; margin: 0; }
+h1, h2, h3 { word-break: auto-phrase; }
+p { margin: 0; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: clamp(16px, 4vw, 40px); }
+.eyebrow { font: 500 var(--step--1)/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--ink-soft); }
+
+/* ── Header ── */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); }
+.top .wrap { display: flex; align-items: center; gap: 1.5rem; padding-block: .8rem; }
+.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; font: 700 1.15rem/1 var(--f-display); letter-spacing: -.02em; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.brand img { width: 44px; height: 44px; flex: none; }
+.shot { margin: 0 0 clamp(1.8rem, 4vw, 2.6rem); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--sheet); box-shadow: var(--shadow); }
+.shot img { display: block; width: 100%; height: auto; }
+.shot figcaption { padding: .6rem 1rem .7rem; font-size: var(--step--1); color: var(--ink-soft); border-top: 1px solid var(--rule); }
+.brand small { font: 500 .72rem/1 var(--f-mono); color: var(--ink-soft); letter-spacing: .04em; }
+.top nav { display: flex; gap: 1.4rem; margin-left: auto; font-size: var(--step--1); }
+.top nav a { text-decoration: none; color: var(--ink-soft); white-space: nowrap; }
+.top nav a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.15rem; border-radius: 10px; font: 600 var(--step--1)/1 var(--f-body); text-decoration: none; border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { border-color: var(--rule); color: var(--ink); background: var(--sheet); }
+.btn-ghost:hover { border-color: var(--ink-soft); }
+footer .langs { margin: .6rem 0 0; padding-top: 0; border-top: 0; font-size: var(--step--1); } footer .langs a { color: inherit; } footer .langs a[aria-current] { font-weight: 600; text-decoration: none; }
+.top-ctas { display: flex; gap: .5rem; margin-left: 1.4rem; }
+.top-ctas .short { display: none; }
+.lang-pick { display: flex; align-items: center; gap: .35rem; margin-inline-start: 1.2rem; color: var(--ink-soft); }
+.lang-pick svg { flex: none; }
+.lang-pick select { appearance: none; -webkit-appearance: none; font: inherit; font-size: var(--step--1); color: var(--ink); background-color: var(--sheet); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23707b82' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .7rem center; border: 1px solid var(--rule); border-radius: 999px; padding: .42rem 1.9rem .42rem .8rem; cursor: pointer; line-height: 1.3; }
+[dir="rtl"] .lang-pick select { background-position: left .7rem center; padding: .42rem .8rem .42rem 1.9rem; }
+.lang-pick select:hover { border-color: var(--ink-soft); }
+.lang-pick select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.top .lang-pick + .top-ctas { margin-inline-start: .6rem !important; }
+.top .wrap:has(.lang-pick) { max-width: 86rem; }
+@media (max-width: 1360px) { .top nav { display: none; } .lang-pick { margin-inline-start: auto; } }
+@media (max-width: 520px) { .top .wrap { gap: .6rem; } .brand span { display: none; } }
+@media (max-width: 520px) { .lang-pick svg { display: none; } .lang-pick select { padding: .5rem 1.5rem .5rem .55rem; background-position: right .5rem center; } [dir="rtl"] .lang-pick select { padding: .5rem .55rem .5rem 1.5rem; background-position: left .5rem center; } }
+@media (max-width: 1320px) { .top nav { gap: .9rem; } .top-ctas { margin-left: 1rem; } }
+@media (max-width: 1200px) { .top nav { display: none; } .top-ctas { margin-left: auto; } }
+@media (max-width: 680px) { .top-ctas .long { display: none; } .top-ctas .short { display: inline; } .top-ctas .btn { padding: .6rem .8rem; } }
+@media (max-width: 400px) { .top .wrap { gap: .45rem; } .brand img { width: 36px; height: 36px; } .top-ctas { gap: .35rem; } .top-ctas .btn { padding: .55rem .6rem; } .top .lang-pick + .top-ctas { margin-inline-start: .35rem !important; } .lang-pick select, [dir="rtl"] .lang-pick select { padding-inline: .45rem 1.35rem; } }
+@media (max-width: 370px) { .top-ctas .btn { padding: .5rem .45rem; font-size: .88rem; } .lang-pick select, [dir="rtl"] .lang-pick select { font-size: .82rem; padding-inline: .4rem 1.2rem; } .lang-pick select { background-position: right .4rem center; } [dir="rtl"] .lang-pick select { background-position: left .4rem center; } }
+
+/* ── Hero ── */
+.hero { padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3.5rem); }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+.hero h1 { font-size: var(--step-3); font-weight: 750; }
+.hero h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--mark) 62%, var(--mark) 92%, transparent 92%); color: inherit; }
+.hero .lede { margin-top: 1.2rem; font-size: var(--step-1); line-height: 1.5; color: var(--ink-soft); max-width: 34rem; }
+.hero .ctas { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.8rem; }
+.hero .fine { margin-top: 1rem; font: 400 var(--step--1)/1.5 var(--f-mono); color: var(--ink-soft); }
+@media (max-width: 900px) { .hero .wrap { grid-template-columns: minmax(0, 1fr); } }
+
+/* The live scan */
+.scan { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.scan-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .6rem .9rem; border-bottom: 1px solid var(--rule); font: 500 .75rem/1 var(--f-mono); color: var(--ink-soft); }
+.scan-bar .dots { display: flex; gap: 6px; }
+.scan-bar .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--rule); display: block; }
+.stage { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: var(--scan-bg); overflow: hidden; user-select: none; }
+.page { position: absolute; inset: 0; padding: 7% 8%; background-color: var(--scan-bg);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .09 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }
+.page .run { font-family: var(--f-book); color: var(--scan-ink); font-size: clamp(.78rem, .55rem + 1vw, 1.05rem); line-height: 1.55; transform: rotate(-.35deg); transform-origin: left top; }
+.page .run h4 { margin: 0 0 .7em; font: 600 .82em/1.2 var(--f-book); letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+.page .run p + p { margin-top: .6em; }
+.page .run .sec { font-weight: 700; }
+.raw .run { font-weight: 260; filter: blur(.7px); opacity: .78; }
+.fixed { clip-path: inset(0 0 0 var(--split, 50%)); }
+.fixed .run { font-weight: var(--wght, 520); filter: blur(var(--blur, .1px)) contrast(var(--con, 1.6)) brightness(var(--bri, .9)); color: var(--scan-fixed); }
+.divider { position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; background: var(--accent); pointer-events: none; }
+.divider::after { content: ""; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; transform: translate(-50%, -50%); border-radius: 50%; background: var(--accent);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path d='M12 10l-5 5 5 5M18 10l5 5-5 5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>"); }
+.tag { position: absolute; top: .7rem; font: 500 .68rem/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; padding: .35rem .5rem; border-radius: 6px; background: var(--sheet); color: var(--ink-soft); border: 1px solid var(--rule); }
+.tag.l { left: .7rem; } .tag.r { right: .7rem; color: var(--accent); }
+.split-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
+.controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem 1.2rem; padding: 1rem 1.1rem 1.1rem; }
+.controls label { display: grid; gap: .35rem; font: 500 .74rem/1.2 var(--f-mono); color: var(--ink-soft); letter-spacing: .02em; }
+.controls label span { display: flex; justify-content: space-between; }
+.controls output { color: var(--ink); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+@media (max-width: 520px) { .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Contents (the page's navigation, set as a book's contents page) ── */
+.contents { padding-block: clamp(1.5rem, 4vw, 3rem); }
+.contents .box { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: clamp(1.2rem, 3vw, 2.2rem) clamp(1.2rem, 4vw, 3rem); }
+.contents h2 { font: 600 var(--step--1)/1 var(--f-mono); letter-spacing: .3em; text-transform: uppercase; text-align: center; color: var(--ink-soft); margin-bottom: 1.2rem; }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: .15rem; font-family: var(--f-book); font-size: var(--step-1); }
+.toc a { display: flex; align-items: baseline; gap: .6rem; text-decoration: none; padding: .35rem .5rem; border-radius: 6px; }
+.toc a:hover { background: color-mix(in srgb, var(--mark) 45%, transparent); }
+.toc .n { font-family: var(--f-mono); font-size: .8em; color: var(--accent); min-width: 1.6em; }
+.toc .t { min-width: 0; }
+.toc .lead { flex: 1; border-bottom: 2px dotted var(--rule); transform: translateY(-.3em); min-width: 1.5rem; }
+.toc .p { font-family: var(--f-mono); font-size: .78em; color: var(--ink-soft); white-space: nowrap; }
+.contents .hint { margin-top: 1rem; text-align: center; font: 400 var(--step--1)/1.5 var(--f-mono); color: var(--ink-soft); }
+@media (max-width: 520px) { .toc .p { display: none; } }
+
+/* ── Sections ── */
+section.chapter { padding-block: clamp(3rem, 7vw, 6rem); border-top: 1px solid var(--rule); scroll-margin-top: 4rem; }
+.chap-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .3rem 1.4rem; align-items: baseline; margin-bottom: clamp(1.8rem, 4vw, 3rem); }
+.chap-head .num { grid-row: span 2; font: 800 clamp(3rem, 2rem + 4vw, 5.5rem)/.8 var(--f-display); color: var(--accent); }
+.chap-head h2 { font-size: var(--step-2); font-weight: 700; }
+.chap-head p { max-width: 42rem; color: var(--ink-soft); font-size: var(--step-1); line-height: 1.5; }
+@media (max-width: 520px) { .chap-head { grid-template-columns: minmax(0, 1fr); } .chap-head .num { grid-row: auto; } }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 2rem); }
+@media (max-width: 760px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* 1 · kept / left out */
+.ledger { border: 1px solid var(--rule); border-radius: 14px; background: var(--sheet); padding: 1.4rem 1.5rem; }
+.ledger h3 { font-size: var(--step-1); margin-bottom: .9rem; display: flex; align-items: center; gap: .5rem; }
+.ledger ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.ledger li { display: grid; grid-template-columns: 1.3rem minmax(0, 1fr); gap: .5rem; }
+.ledger li::before { font-family: var(--f-mono); color: var(--accent); }
+.ledger.keep li::before { content: "+"; }
+.ledger.drop li::before { content: "–"; color: var(--ink-soft); }
+.ledger.drop li { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--ink-soft) 50%, transparent); }
+.facts { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem; }
+.chip { font: 500 var(--step--1)/1 var(--f-mono); padding: .55rem .75rem; border-radius: 999px; border: 1px solid var(--rule); background: var(--sheet); }
+
+/* 2 · enhancement */
+.knobs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.knob { padding: 1.2rem; border-top: 3px solid var(--ink); background: var(--sheet); border-radius: 0 0 12px 12px; }
+.knob h3 { font-size: var(--step-1); margin-bottom: .4rem; }
+.knob .sample { font-family: var(--f-book); font-size: 1.6rem; line-height: 1; margin-bottom: .8rem; display: flex; gap: .6rem; align-items: baseline; }
+.knob .sample b { color: var(--accent); font-family: var(--f-mono); font-size: .9rem; }
+@media (max-width: 900px) { .knobs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .knobs { grid-template-columns: minmax(0, 1fr); } }
+.note { margin-top: 1.5rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.note p { font-size: var(--step--1); color: var(--ink-soft); padding-left: .9rem; border-left: 2px solid var(--rule); }
+.note b { color: var(--ink); font-weight: 600; }
+@media (max-width: 760px) { .note { grid-template-columns: minmax(0, 1fr); } }
+
+/* 3 · OCR */
+.ocr-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+@media (max-width: 900px) { .ocr-grid { grid-template-columns: minmax(0, 1fr); } }
+.scripts { display: grid; gap: .7rem; }
+.script { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 1rem; align-items: center; padding: 1rem 1.1rem; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; }
+.script .glyph { font: 500 1.9rem/1 var(--f-book); text-align: center; }
+.script h3 { font-size: var(--step-0); font-weight: 650; font-family: var(--f-body); letter-spacing: 0; }
+.script p { font-size: var(--step--1); color: var(--ink-soft); }
+.script .glyph[lang="ar"] { direction: rtl; }
+.lat-list { margin-top: .4rem; font-size: .8rem !important; line-height: 1.55; }
+.proof { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 1.4rem; }
+.proof h3 { font-size: var(--step-1); margin-bottom: .3rem; }
+.proof .sub { font-size: var(--step--1); color: var(--ink-soft); margin-bottom: 1.2rem; }
+.bar { display: grid; gap: .3rem; margin-bottom: 1.1rem; }
+.bar .lbl { display: flex; justify-content: space-between; gap: 1rem; font: 500 .78rem/1.3 var(--f-mono); }
+.bar .lbl span:last-child { font-variant-numeric: tabular-nums; }
+.bar .track { height: 10px; border-radius: 5px; background: var(--rule); overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 5px; background: var(--ink-soft); }
+.bar.us .fill { background: var(--accent); }
+.proof .foot { font-size: .75rem; color: var(--ink-soft); line-height: 1.5; border-top: 1px solid var(--rule); padding-top: .9rem; margin-top: .4rem; }
+.ocr-points { margin-top: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem 1.4rem; }
+.ocr-points p { font-size: var(--step--1); color: var(--ink-soft); }
+.ocr-points b { display: block; color: var(--ink); font-size: var(--step-0); margin-bottom: .15rem; }
+@media (max-width: 520px) { .ocr-points { grid-template-columns: minmax(0, 1fr); } }
+
+/* 3 · head to head */
+.vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 1.5rem); margin-bottom: clamp(2rem, 5vw, 3rem); }
+@media (max-width: 760px) { .vs { grid-template-columns: minmax(0, 1fr); } }
+.vs-card { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; padding: 1.3rem 1.4rem 1.1rem; display: grid; gap: .9rem; min-width: 0; }
+.vs-card h3 { font-size: var(--step-1); margin-top: .35rem; }
+.vs-card figcaption p { font-size: var(--step--1); margin-top: .25rem; }
+.vs-table { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+.vs-table th, .vs-table td { padding: .55rem .4rem; border-top: 1px solid var(--rule); text-align: left; font-weight: 400; }
+.vs-table thead th { border-top: 0; font: 500 .7rem/1.2 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); padding-top: 0; }
+.vs-table .num-col { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; width: 1%; }
+.vs-table .bar-col { width: 45%; }
+.vs-table tbody th { white-space: nowrap; }
+.vs-table tr.us th, .vs-table tr.us td { font-weight: 650; color: var(--ink); }
+.vbar { display: block; height: 10px; width: var(--w); border-radius: 5px; background: var(--ink-soft); opacity: .55; }
+.vs-table tr.us .vbar { background: var(--accent); opacity: 1; }
+.vs-card .scale { font: 400 .72rem/1.4 var(--f-mono); color: var(--ink-soft); }
+.vs-method { grid-column: 1 / -1; font-size: var(--step--1); color: var(--ink-soft); max-width: 75ch; }
+.vs-method b { color: var(--ink); font-weight: 600; }
+.vs-disclaimer { grid-column: 1 / -1; font-size: .78rem; line-height: 1.55; color: var(--ink-soft); max-width: 75ch; padding: .8rem 1rem; border: 1px dashed var(--rule); border-radius: 10px; }
+.vs-disclaimer b { color: var(--ink); font-weight: 600; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 420px) { .vs-table .bar-col { display: none; } }
+
+/* 3 · language list */
+.langs { margin-top: clamp(2rem, 5vw, 3rem); border-top: 1px solid var(--rule); padding-top: clamp(1.5rem, 4vw, 2rem); }
+.langs h3 { font-size: var(--step-1); margin-bottom: 1rem; }
+.langs h3 .muted { font: 400 var(--step--1)/1 var(--f-body); }
+.lang-grid { margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: 1rem 1.6rem; }
+.lang-grid div { min-width: 0; }
+.lang-grid dt { font: 500 .72rem/1.3 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: .3rem; }
+.lang-grid dd { margin: 0; font-size: var(--step--1); line-height: 1.55; }
+.lang-note { margin-top: 1.2rem; font-size: .78rem; color: var(--ink-soft); max-width: 75ch; }
+
+/* 4 · bookmarks + links */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; counter-reset: s; }
+.steps li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr); gap: .9rem; counter-increment: s; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 2px solid var(--accent); color: var(--accent); font: 700 1rem/1 var(--f-mono); }
+.steps h3 { font-size: var(--step-0); font-family: var(--f-body); font-weight: 650; letter-spacing: 0; }
+.steps p { font-size: var(--step--1); color: var(--ink-soft); }
+.demo-toc { background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+.demo-toc .tree { border-right: 1px solid var(--rule); padding: 1rem; font-size: .8rem; }
+.demo-toc .tree .h { font: 600 .7rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: .7rem; }
+.bm { display: flex; gap: .45rem; align-items: center; padding: .28rem .3rem; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bm .pg { font: 500 .66rem/1 var(--f-mono); color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: .2rem .35rem; border-radius: 4px; flex: none; }
+.bm.l2 { padding-left: 1.2rem; } .bm.l3 { padding-left: 2.1rem; }
+.bm.on { background: color-mix(in srgb, var(--mark) 50%, transparent); }
+.demo-toc .leaf { padding: 1.1rem 1.2rem; background: var(--scan-bg); font-family: var(--f-book); color: #2a2722; font-size: .82rem; }
+.leaf .ttl { text-align: center; letter-spacing: .25em; font-size: .72rem; margin-bottom: .8rem; }
+.leaf .row { display: flex; gap: .4rem; align-items: baseline; padding: .18rem .3rem; border-radius: 4px; }
+.leaf .row .d { flex: 1; border-bottom: 1.5px dotted #9b958a; transform: translateY(-.25em); }
+.leaf .row.ind { padding-left: 1.1rem; }
+.leaf .row.link { outline: 1.5px solid var(--accent); background: rgba(11,127,115,.08); }
+.leaf .cursor { display: inline-block; width: 0; height: 0; margin-left: .3rem; border-left: 6px solid #2a2722; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transform: rotate(-30deg); }
+@media (max-width: 520px) { .demo-toc { grid-template-columns: minmax(0, 1fr); } .demo-toc .tree { border-right: 0; border-bottom: 1px solid var(--rule); } }
+
+/* more tools */
+.tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-left: 1px solid var(--rule); }
+.tools div { padding: 1.2rem 1.3rem; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.tools h3 { font-size: var(--step-0); font-family: var(--f-body); font-weight: 650; letter-spacing: 0; margin-bottom: .25rem; }
+.tools p { font-size: var(--step--1); color: var(--ink-soft); }
+@media (max-width: 900px) { .tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .tools { grid-template-columns: minmax(0, 1fr); } }
+
+/* 5 · compress */
+.cmp { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(1rem, 3vw, 2rem); align-items: start; }
+@media (max-width: 900px) { .cmp { grid-template-columns: minmax(0, 1fr); } }
+.cmp-example { background: var(--ink); color: var(--paper); border-radius: 16px; padding: clamp(1.3rem, 3vw, 2rem); display: grid; gap: .9rem; }
+.cmp-example .eyebrow { color: var(--mark); }
+.cmp-example h3 { font-size: var(--step-1); }
+.size-row { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr) auto; gap: .8rem; align-items: center; font: 500 .8rem/1 var(--f-mono); }
+.size-bar { height: 22px; border-radius: 6px; background: color-mix(in srgb, var(--paper) 12%, transparent); overflow: hidden; }
+.size-bar span { display: block; height: 100%; width: var(--w); background: color-mix(in srgb, var(--paper) 45%, transparent); border-radius: 6px; }
+.size-row.after .size-bar span { background: var(--mark); }
+.size-val { font-variant-numeric: tabular-nums; font-size: .95rem; }
+.size-row.after .size-val { color: var(--mark); font-weight: 600; }
+.cmp-foot { font-size: var(--step--1); color: color-mix(in srgb, var(--paper) 75%, transparent) !important; }
+.huge { margin-bottom: clamp(1.5rem, 4vw, 2.5rem); }
+.speed { display: grid; gap: .55rem; margin: 0; }
+.speed div { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; padding-bottom: .5rem; border-bottom: 1px solid color-mix(in srgb, var(--paper) 18%, transparent); }
+.speed dt { white-space: nowrap; font-size: var(--step--1); color: color-mix(in srgb, var(--paper) 80%, transparent); }
+.speed dd { margin: 0; font: 600 .95rem/1.2 var(--f-mono); color: var(--mark); text-align: right; font-variant-numeric: tabular-nums; }
+.cmp-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+@media (max-width: 520px) { .cmp-options { grid-template-columns: minmax(0, 1fr); } }
+.opt { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1.1rem; }
+.opt h3 { font: 650 var(--step-0)/1.2 var(--f-body); letter-spacing: 0; margin-bottom: .3rem; }
+.opt p { font-size: var(--step--1); color: var(--ink-soft); }
+
+/* 6 · price */
+.price { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+@media (max-width: 760px) { .price { grid-template-columns: minmax(0, 1fr); } }
+.ticket { background: var(--ink); color: var(--paper); border-radius: 18px; padding: clamp(1.6rem, 4vw, 2.6rem); position: relative; overflow: hidden; }
+.ticket .amt { font: 800 clamp(4.5rem, 3rem + 7vw, 8rem)/.9 var(--f-display); letter-spacing: -.04em; }
+.ticket .amt sup { font-size: .38em; vertical-align: .9em; margin-right: .05em; }
+.ticket .per { font: 500 var(--step--1)/1.4 var(--f-mono); opacity: .8; margin-top: .4rem; }
+.ticket ul { list-style: none; padding: 0; margin: 1.4rem 0 1.6rem; display: grid; gap: .45rem; font-size: var(--step--1); }
+.ticket li::before { content: "✓"; margin-right: .6rem; color: var(--mark); }
+.ticket .btn-primary { background: var(--mark); color: var(--mark-ink); }
+.ticket .bulk { margin-top: 1.1rem; font-size: var(--step--1); opacity: .85; }
+.ticket .bulk a { color: inherit; text-decoration: underline; text-underline-offset: .15em; }
+.ticket::after { content: ""; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; border: 28px solid color-mix(in srgb, var(--paper) 10%, transparent); }
+.compare p { font-size: var(--step-1); line-height: 1.55; color: var(--ink-soft); }
+.compare p + p { margin-top: 1rem; }
+.compare strong { color: var(--ink); }
+.trial { margin-top: clamp(2rem, 5vw, 3rem); border: 1px solid var(--rule); border-radius: 18px; background: var(--sheet); padding: clamp(1.4rem, 3.5vw, 2.2rem); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.2rem, 4vw, 2.6rem); align-items: start; }
+.trial h3 { font-size: var(--step-1); margin-bottom: .5rem; }
+.trial p { color: var(--ink-soft); }
+.trial .btn { margin-top: 1.1rem; }
+.trial .file { margin-top: .7rem; font: 500 .78rem/1.5 var(--f-mono); color: var(--ink-soft); overflow-wrap: anywhere; }
+.trial ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .5rem; font-size: var(--step--1); color: var(--ink-soft); }
+.trial ul b { color: var(--ink); font-weight: 600; }
+@media (max-width: 760px) { .trial { grid-template-columns: minmax(0, 1fr); } }
+
+/* FAQ */
+.faq { display: grid; gap: .7rem; }
+.faq details { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1.2rem; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { margin-top: .6rem; color: var(--ink-soft); font-size: var(--step--1); max-width: 60ch; }
+
+/* Footer */
+footer { border-top: 1px solid var(--rule); padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--ink-soft); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; align-items: center; }
+footer nav { display: flex; flex-wrap: wrap; gap: 1.2rem; }
+footer a { text-decoration: none; } footer a:hover { color: var(--ink); }
+footer .tm { flex-basis: 100%; font-size: .75rem; margin: 0; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="BixoPDF ホーム">
+      <img src="../brand-icon.png" width="44" height="44" alt="" aria-hidden="true">
+      <span>BixoPDF</span>
+    </a>
+    <nav aria-label="セクション">
+      <a href="#fast">速さの理由</a>
+      <a href="#annotate">注釈</a>
+      <a href="#dictionary">辞書</a>
+      <a href="#enhance">スキャン補正</a>
+      <a href="#ocr">OCR</a>
+      <a href="#bookmarks">しおり</a>
+      <a href="#compress">圧縮</a>
+      <a href="#price">価格</a>
+    </nav>
+    <label class="lang-pick"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5M12 2.5C9.4 5.3 8.1 8.5 8.1 12s1.3 6.7 3.9 9.5"/></svg><select aria-label="言語" onchange="if(this.value)location.href=this.value"><option value="/" lang="en">English</option><option value="/ko/" lang="ko">한국어</option><option value="/ja/" lang="ja" selected>日本語</option><option value="/ru/" lang="ru">Русский</option><option value="/ar/" lang="ar">العربية</option><option value="/hi/" lang="hi">हिन्दी</option></select></label>
+    <div class="top-ctas">
+      <a class="btn btn-primary" data-goatcounter-click="store-top" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM?hl=ja-JP&gl=JP">$29で購入</a>
+      <a class="btn btn-ghost" data-goatcounter-click="trial-top" href="https://github.com/nimis0612/bixopdf-site/releases/latest/download/BixoPDF-Trial-Setup.exe"><span class="long">15日間無料体験版</span><span class="short">体験版</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Windows用PDF編集ソフト</p>
+        <h1 style="margin-top:.8rem">スキャン文書を<em>読みやすく</em>、検索しやすく、ページ移動もかんたんに。</h1>
+        <p class="lede">しおり・注釈・メモをそろえた本格的なPDF編集ソフトに、スキャン文書に必要な機能を加えました。お使いのPC上で50言語の文字を認識するOCR、薄いページを見やすくする画像補正と線の太さ調整、本の目次ページから作るしおりとハイパーリンク、大きなスキャンファイルの圧縮、そしてページ上のどの単語でも調べられる7言語の辞書を搭載しています。</p>
+        <div class="ctas">
+          <a class="btn btn-primary" data-goatcounter-click="store-hero" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM?hl=ja-JP&gl=JP">$29で購入</a>
+          <a class="btn btn-ghost" data-goatcounter-click="trial-hero" href="https://github.com/nimis0612/bixopdf-site/releases/latest/download/BixoPDF-Trial-Setup.exe">15日間の体験版をダウンロード</a>
+        </div>
+        <p class="fine">Windows 10（1809以降）・11 · 64ビット · アカウント登録不要・サブスクリプションなし · 15日間の無料体験版</p>
+      </div>
+
+      <figure class="scan" style="margin:0" aria-label="インタラクティブな例: 薄いスキャンページの補正前と補正後">
+        <div class="scan-bar"><span class="dots"><i></i><i></i><i></i></span><span>画像補正 · 1 / 1,082ページ</span><span>リアルタイムプレビュー</span></div>
+        <div class="stage" id="stage">
+          <div class="page raw" aria-hidden="true"><div class="run" lang="en">
+            <h4>Marine Insurance Act 1906</h4>
+            <p><span class="sec">1.</span> A contract of marine insurance is a contract whereby the insurer undertakes to indemnify the assured, in manner and to the extent thereby agreed, against marine losses, that is to say, the losses incident to marine adventure.</p>
+            <p><span class="sec">2.</span> A contract of marine insurance may, by its express terms, or by usage of trade, be extended so as to protect the assured against losses on inland waters or on any land risk which may be incidental to any sea voyage.</p>
+          </div></div>
+          <div class="page fixed" id="fixed"><div class="run" lang="en">
+            <h4>Marine Insurance Act 1906</h4>
+            <p><span class="sec">1.</span> A contract of marine insurance is a contract whereby the insurer undertakes to indemnify the assured, in manner and to the extent thereby agreed, against marine losses, that is to say, the losses incident to marine adventure.</p>
+            <p><span class="sec">2.</span> A contract of marine insurance may, by its express terms, or by usage of trade, be extended so as to protect the assured against losses on inland waters or on any land risk which may be incidental to any sea voyage.</p>
+          </div></div>
+          <div class="divider" aria-hidden="true"></div>
+          <span class="tag l">補正前</span><span class="tag r">補正後</span>
+          <input class="split-range" id="split" type="range" min="5" max="95" value="50" aria-label="補正前と補正後の境界線を動かす">
+        </div>
+        <div class="controls">
+          <label for="k-wght"><span>太さ <output id="o-wght">+40</output></span><input id="k-wght" type="range" min="0" max="100" value="60"></label>
+          <label for="k-sharp"><span>シャープネス <output id="o-sharp">80</output></span><input id="k-sharp" type="range" min="0" max="100" value="80"></label>
+          <label for="k-con"><span>コントラスト <output id="o-con">+60</output></span><input id="k-con" type="range" min="0" max="100" value="60"></label>
+          <label for="k-bri"><span>明るさ <output id="o-bri">−10</output></span><input id="k-bri" type="range" min="0" max="100" value="40"></label>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <div class="contents">
+    <div class="wrap">
+      <nav class="box" aria-label="目次">
+        <h2>目次</h2>
+        <ol class="toc">
+          <li><a href="#fast"><span class="n">1</span><span class="t">小さく、軽く、速く</span><span class="lead"></span><span class="p">1,000ページのファイルもすぐ開く</span></a></li>
+          <li><a href="#annotate"><span class="n">2</span><span class="t">しおり・注釈・メモ</span><span class="lead"></span><span class="p">どのページにもすぐ移動</span></a></li>
+          <li><a href="#dictionary"><span class="n">3</span><span class="t">ページ上の単語をその場で調べる</span><span class="lead"></span><span class="p">7言語</span></a></li>
+          <li><a href="#enhance"><span class="n">4</span><span class="t">薄いスキャンを数秒で補正</span><span class="lead"></span><span class="p">太さ · シャープネス · コントラスト</span></a></li>
+          <li><a href="#ocr"><span class="n">5</span><span class="t">独自データで学習したOCR</span><span class="lead"></span><span class="p">主要ソフトと比較</span></a></li>
+          <li><a href="#bookmarks"><span class="n">6</span><span class="t">しおりと目次リンクを自動作成</span><span class="lead"></span><span class="p">何日もかかる作業が数分に</span></a></li>
+          <li><a href="#compress"><span class="n">7</span><span class="t">大きなスキャンを小さく</span><span class="lead"></span><span class="p">609 MB → 332 MB</span></a></li>
+          <li><a href="#price"><span class="n">8</span><span class="t">価格は$29のみ</span><span class="lead"></span><span class="p">$29</span></a></li>
+        </ol>
+        <p class="hint">上の各行はリンクになっています。BixoPDFは、PDFの目次ページにも同じようにリンクを付けます。</p>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <section class="chapter" id="fast">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">1</span>
+        <h2>小さく、軽く、速く</h2>
+        <p>毎日の文書作業に必要な機能を、すばやく起動するアプリにまとめました。数千ページのファイルでも、待たずにページをめくれます。</p>
+      </div>
+      <div class="cmp huge">
+        <div class="cmp-example">
+          <p class="eyebrow">実際の文書</p>
+          <h3>裁判所の鑑定書 · 3,286ページ · 383 MB</h3>
+          <dl class="speed">
+            <div><dt>表示されてスクロールできるまで</dt><dd>1秒未満</dd></div>
+            <div><dt>3,286ページ目へ移動</dt><dd>0.2秒</dd></div>
+            <div><dt>編集の準備完了</dt><dd>数秒後（バックグラウンドで）</dd></div>
+          </dl>
+          <p class="muted cmp-foot">当社のWindows 11 PCで、ディスク上のファイルをクリックして開いたときの測定値です。</p>
+        </div>
+        <div class="cmp-options">
+          <div class="opt"><h3>クリックした瞬間に開く</h3><p>数百MB、1,000ページを超えるファイルでも、1ページのPDFとほとんど変わらない速さで開きます。進行状況バーを眺めて待つ必要はありません。</p></div>
+          <div class="opt"><h3>すべてのページにすぐアクセス</h3><p>スクロール、最後のページへの移動、サムネイル表示、テキストの選択とコピーがすぐにできます。ファイルから読み込むのは画面に表示しているページだけ、作成・描画するのも見えているサムネイルだけなので、3,340ページの本でもページパネルがすぐに開きます。</p></div>
+          <div class="opt"><h3>編集の準備は裏側で</h3><p>読んでいる間に、バックグラウンドで編集の準備が進みます。ハイライトやメモはすぐに書き込めます。準備が終わる前にページを変更するツールを使うと、少しだけ待つことがあります。</p></div>
+          <div class="opt"><h3>メモリは控えめ</h3><p>ページの描画には、軽くて高速なPDFレンダリングエンジンを使っています。表示する部分だけを読み込むので、巨大なスキャンを開いても、ほかの作業に使うメモリが十分に残ります。</p></div>
+        </div>
+      </div>
+      <figure class="shot">
+        <img src="../shot-viewer.webp" width="1600" height="875" loading="lazy" alt="ダークグリーンのテーマで表示したBixoPDFのウィンドウ。タブ、コンパクトなツールバー、スキャンしたページと、検索・ファイル・OCR・目次・画像補正・トリミング・分割・圧縮のサイドボタン">
+        <figcaption>1つのウィンドウに、文書ごとのタブ。よく使うツールはワンクリックで使え、その他のツールはサイドバーにまとまっています。</figcaption>
+      </figure>
+      <div class="two">
+        <div class="ledger keep">
+          <h3>搭載しているもの</h3>
+          <ul>
+            <li>テキストの閲覧・検索・コピー（スキャンしたページでも）</li>
+            <li>しおり、ハイライト、手書き、メモ、スタンプ、署名</li>
+            <li>ページの結合・分割・トリミング・回転・並べ替え</li>
+            <li>お使いのPC上で動くOCR</li>
+            <li>しおりと目次リンクの自動作成</li>
+            <li>圧縮、パスワード保護、ページを画像として保存</li>
+          </ul>
+        </div>
+        <div class="ledger drop">
+          <h3>省いたもの</h3>
+          <ul>
+            <li>サインイン、クラウドストレージ、同期</li>
+            <li>月額サブスクリプションと更新のお知らせ</li>
+            <li>アップグレードを勧めるバナーや体験版の催促</li>
+            <li>フォームデザイナーや印刷用のプリフライト</li>
+            <li>5階層もある深いメニュー</li>
+            <li>文書がPCの外に出ること</li>
+          </ul>
+        </div>
+      </div>
+      <div class="facts">
+        <span class="chip">オフラインで動作</span>
+        <span class="chip">アカウント不要</span>
+        <span class="chip">1つのウィンドウ、文書ごとにタブ</span>
+        <span class="chip">English · 한국어 · 日本語 · 简体中文 · 繁體中文 · Русский · हिन्दी · العربية</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="chapter" id="annotate">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">2</span>
+        <h2>しおり・注釈・メモ</h2>
+        <p>紙の本と同じように、書き込みをしたり、あとで見返すためのメモを残したりしながら読み進められます。しおり、ページのサムネイル、注釈一覧から、どのページにもワンクリックで戻れます。</p>
+      </div>
+      <figure class="shot">
+        <img src="../annotate.png" width="1400" height="528" loading="lazy" alt="左にしおりツリーとページのサムネイル、中央にハイライト・下線・ペンの丸囲み・四角形・メモ・テキストボックスを付けたページ、右に注釈一覧を表示したBixoPDF">
+      </figure>
+      <div class="tools">
+        <div><h3>しおり</h3><p>しおりを作成し、ドラッグで順番や階層を変更できます。クリックするとそのページへ移動します。</p></div>
+        <div><h3>注釈</h3><p>ハイライト、下線、取り消し線、ペンでの手書きのほか、四角形・円・直線・矢印も追加できます。</p></div>
+        <div><h3>メモとテキストボックス</h3><p>ページにメモを貼ったり、直接書き込んだりできます。スタンプや署名も使えます。</p></div>
+        <div><h3>注釈を一覧で</h3><p>すべての注釈を種類別・ページ順に、テキストと一緒に一覧表示します。クリックするとその場所へ移動します。</p></div>
+        <div><h3>ページを一覧で</h3><p>数千ページの本でも、全ページのサムネイルを表示します。描画するのは見えている分だけなので、すぐに表示され、メモリもあまり使いません。どのページにもワンクリックで移動できます。</p></div>
+        <div><h3>リンクもそのまま使える</h3><p>ほかのページへのリンクはそのページへ移動し、WebアドレスはWebブラウザーで開きます。開くのはWebとメールのリンクだけです。</p></div>
+      </div>
+      <div class="note">
+        <p><b>標準のPDF形式。</b>しおり・注釈・メモは通常のPDFのしおりと注釈として保存されるので、ほかのPDFビューアーでも表示されます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="chapter" id="dictionary">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">3</span>
+        <h2>ページ上の単語をその場で調べる</h2>
+        <p>7言語の辞書をビューアーに内蔵しました。単語をダブルクリックするだけで、ページを離れることもブラウザーを開くこともなく意味がわかります。デジタルで作成されたPDFでも、OCR済みのスキャンでも使えます。</p>
+      </div>
+      <figure class="shot">
+        <img src="../shot-dictionary.webp" width="1600" height="875" loading="lazy" alt="アメリカ合衆国憲法前文のスキャンページ。単語Libertyが枠で囲まれ、その下に3つの語義を示したカード。右側の辞書パネルには、establishのすべての語義、発音、例文、出典と、インストール済みの言語パックが表示されている">
+        <figcaption>単語をダブルクリックすると、主な語義を示したカードが開きます。辞書パネルには、発音と例文付きですべての語義が表示されます。</figcaption>
+      </figure>
+      <div class="tools">
+        <div><h3>単語をダブルクリック</h3><p>単語のそばにカードが開き、発音と主な語義を表示します。<i>詳しく</i>を押すと、パネルですべての語義を確認できます。集中モードでも使えます。</p></div>
+        <div><h3>パネルですべての語義を表示</h3><p>品詞、定義、例文を、語義ごとに番号を付けて表示します。単語を入力して調べることも、ページ上のフレーズを選択して調べることもできます。</p></div>
+        <div><h3>7言語を自由な組み合わせで</h3><p>英語、韓国語、日本語、中国語、ドイツ語、フランス語、ロシア語に対応。説明に使う言語を選べるので、英単語を韓国語で、ドイツ語の単語を日本語で調べることもできます。</p></div>
+        <div><h3>辞書形を自動で検索</h3><p>複数形や過去形、韓国語や日本語の動詞の活用形も基本形で調べるので、印刷されている形のまま検索できます。</p></div>
+        <div><h3>一度ダウンロードすればオフライン</h3><p>必要な言語をパネルで選ぶと、一度だけダウンロードされます。その後の検索はすべてPC上で行われ、調べた単語がどこかに送信されることはありません。</p></div>
+        <div><h3>オープンな辞書、出典も明記</h3><p>WiktionaryやOpen Multilingual Wordnetなどのオープンな辞書をもとに作成しています。各項目には出典とライセンスを表示します。</p></div>
+      </div>
+      <div class="note">
+        <p><b>言語パックは無料。</b>言語パックはアプリに含まれ、追加料金はかかりません。パネルの<i>更新を確認</i>で更新できます。ダウンロードサイズは1つあたり20～70 MBで、不要になったパックはパネルから削除できます。ダウンロード時に送信するもの・しないものについては、<a href="../privacy.html">プライバシーポリシー</a>をご覧ください。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="chapter" id="enhance">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">4</span>
+        <h2>薄いスキャンを数秒で補正</h2>
+        <p>古いコピーや灰色がかったスキャンは、読んでいると疲れます。スライダーを動かせば、画面上のページがすぐに変わります。仕上がりに納得したら、1ページだけ、<code>1-5</code>のような範囲、または本全体に適用できます。</p>
+      </div>
+      <div class="knobs">
+        <div class="knob"><div class="sample"><span style="font-weight:250">Aa</span><b>→</b><span style="font-weight:700">Aa</span></div><h3>太さ</h3><p class="muted">細くかすれた線が、しっかりした文字に戻ります。</p></div>
+        <div class="knob"><div class="sample"><span style="filter:blur(1.2px)">Aa</span><b>→</b><span>Aa</span></div><h3>シャープネス</h3><p class="muted">ぼやけた輪郭がくっきりします。</p></div>
+        <div class="knob"><div class="sample"><span style="opacity:.45">Aa</span><b>→</b><span>Aa</span></div><h3>コントラスト</h3><p class="muted">灰色の紙に灰色の文字が、白地に黒い文字になります。</p></div>
+        <div class="knob"><div class="sample"><span style="opacity:.7;background:var(--scan-bg);padding:0 .15em;border-radius:3px">Aa</span><b>→</b><span>Aa</span></div><h3>明るさ</h3><p class="muted">黄ばんだページや暗いページが、白い紙のようになります。</p></div>
+      </div>
+      <figure class="shot">
+        <img src="../shot-adjust.webp" width="1600" height="875" loading="lazy" alt="スキャンしたページを濃く鮮明にした画像補正パネル。自動レベル補正、傾き補正、明るさ、コントラスト、線を太く、アンシャープマスクと、すべてのページ・奇数ページ・偶数ページ・ページ範囲に適用するボタン">
+        <figcaption>画像補正: スライダーを動かすと左のページが変わります。すべてのページ、奇数・偶数ページ、または範囲を指定して適用できます。</figcaption>
+      </figure>
+      <div class="note">
+        <p><b>適用する前に確認。</b>プレビューには仕上がりがそのまま表示されます。適用するまで、ページは何も変更されません。</p>
+        <p><b>ページ範囲を指定。</b><code>1,2,3</code>や<code>10-40</code>と入力すれば、同じ設定を多くのページにまとめて適用できます。</p>
+        <p><b>ページの調整も。</b>余白のトリミング、見開きページを1ページずつに分割、OCRのための傾き補正もできます。</p>
+        <p><b>OCRテキストはそのまま。</b>OCRテキストがあるページは、補正したページを保存してもテキストが残ります。傾きを補正したページでは、テキストも一緒に回転します。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="chapter" id="ocr">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">5</span>
+        <h2>独自データで学習したOCR</h2>
+        <p>文字認識エンジンは、独自のデータで学習させました。韓国語のスキャン本では、BixoPDFの誤りは主要PDFソフトAの約3分の1、ソフトBの約5分の1でした。英語の本では、2つのうち成績の良いほうと同等です。処理はすべてPC上で行われるため、文書がサーバーに送られることはありません。</p>
+      </div>
+      <div class="vs">
+        <figure class="vs-card">
+          <figcaption><span class="eyebrow">テスト文書の言語 · 韓国語</span><h3>韓国の裁判実務書をスキャンした36ページ</h3><p class="muted">53,123文字 · 本文、囲み記事の例、表、6ポイントの脚注</p></figcaption>
+          <table class="vs-table">
+            <thead><tr><th scope="col">ソフト</th><th scope="col" class="num-col">文字誤り率</th><th scope="col" class="bar-col"><span class="sr">グラフ</span></th></tr></thead>
+            <tbody>
+              <tr class="us"><th scope="row">BixoPDF</th><td class="num-col">0.84%</td><td class="bar-col"><span class="vbar" style="--w:16.8%"></span></td></tr>
+              <tr><th scope="row">主要PDFソフトA</th><td class="num-col">2.31%</td><td class="bar-col"><span class="vbar" style="--w:46.2%"></span></td></tr>
+              <tr><th scope="row">主要PDFソフトB</th><td class="num-col">4.20%</td><td class="bar-col"><span class="vbar" style="--w:84%"></span></td></tr>
+            </tbody>
+          </table>
+          <p class="scale">グラフの目盛りは0～5%。数値が低いほど高精度です。</p>
+        </figure>
+        <figure class="vs-card">
+          <figcaption><span class="eyebrow">テスト文書の言語 · 英語</span><h3>英語の建設法の専門書をスキャンした32ページ</h3><p class="muted">81,443文字 · 本文、引用、脚注</p></figcaption>
+          <table class="vs-table">
+            <thead><tr><th scope="col">ソフト</th><th scope="col" class="num-col">文字誤り率</th><th scope="col" class="bar-col"><span class="sr">グラフ</span></th></tr></thead>
+            <tbody>
+              <tr class="us"><th scope="row">BixoPDF</th><td class="num-col">0.25%</td><td class="bar-col"><span class="vbar" style="--w:50%"></span></td></tr>
+              <tr><th scope="row">主要PDFソフトA</th><td class="num-col">0.26%</td><td class="bar-col"><span class="vbar" style="--w:52%"></span></td></tr>
+              <tr><th scope="row">主要PDFソフトB</th><td class="num-col">0.35%</td><td class="bar-col"><span class="vbar" style="--w:70%"></span></td></tr>
+            </tbody>
+          </table>
+          <p class="scale">グラフの目盛りは0～0.5%。数値が低いほど高精度です。</p>
+        </figure>
+        <p class="vs-method"><b>テスト方法。</b>デジタルで作成されたPDFのページを、わずかな傾き・ぼかし・ノイズ・JPEG圧縮を加えた300 dpiのグレースケールスキャンに変換して画像だけのPDFとして保存し、2026年10月に同じPC上で各ソフトのOCRにかけました。各結果のテキストレイヤーを同じ方法で読み取り、スペースを除いて元のテキストと比較しています。どちらの本も、当社の認識エンジンの学習には使っていません。ソフトAとBは、OCR機能を内蔵した広く使われている市販のPDF編集ソフト2製品で、テスト用PCにインストールされていたバージョンを使用しました。</p>
+        <p class="vs-disclaimer"><b>免責事項。</b>この結果は、限られた環境で、限られた文書を使って行ったテストによるものです。あらゆる環境やあらゆる文書で同じ結果が得られることを意味するものではありません。精度はスキャンの状態、レイアウト、フォント、言語、設定によって変わるため、お使いの環境での結果とは異なる場合があります。</p>
+      </div>
+      <figure class="shot">
+        <img src="../shot-ocr.webp" width="1600" height="875" loading="lazy" alt="ページを認識した後のOCRパネル。認識した各行がページ上で色付きの枠で囲まれ、右側に信頼度とともに一覧表示されている">
+        <figcaption>OCRパネル: 読み取った行はすべてページ上で枠に囲まれ、横に一覧表示されるので、保存する前に結果を確認できます。</figcaption>
+      </figure>
+      <div class="ocr-grid">
+        <div class="scripts">
+          <div class="script"><div class="glyph">Aé ß</div><div><h3>ラテン文字 <span class="muted" style="font-weight:400">· 既定</span></h3>
+            <p class="lat-list">英語、フランス語、ドイツ語、スペイン語、ポルトガル語、イタリア語、オランダ語、デンマーク語、ノルウェー語、スウェーデン語、フィンランド語、アイスランド語、ポーランド語、チェコ語、スロバキア語、ハンガリー語、スロベニア語、クロアチア語、セルビア語（ラテン文字）、ボスニア語、リトアニア語、エストニア語、トルコ語、アルバニア語、カタルーニャ語、アイルランド語、インドネシア語、マレー語、タガログ語、スワヒリ語、ラテン語</p></div></div>
+          <div class="script"><div class="glyph" lang="ru">Жя</div><div><h3>キリル文字</h3>
+            <p>ロシア語、ウクライナ語、ベラルーシ語、ブルガリア語、セルビア語（キリル文字）、マケドニア語、カザフ語、キルギス語、タジク語、モンゴル語、タタール語。同じ行にあるラテン文字の単語も読み取ります。</p></div></div>
+          <div class="script"><div class="glyph" lang="hi">हिन्दी</div><div><h3>デーヴァナーガリー文字</h3>
+            <p>ヒンディー語、マラーティー語、ネパール語、サンスクリット語。同じ行にある数字やラテン文字の単語も読み取ります。</p></div></div>
+          <div class="script"><div class="glyph" lang="ko">한글</div><div><h3>韓国語</h3><p>ハングル、漢字、分かち書きを一度に認識します。日本語の引用も読み取ります。</p></div></div>
+          <div class="script"><div class="glyph" lang="zh">中文</div><div><h3>中国語</h3><p>簡体字と繁体字に対応。最新世代の認識エンジンを使っています。</p></div></div>
+          <div class="script"><div class="glyph" lang="ja">日本語</div><div><h3>日本語</h3><p>漢字とかなに加え、同じページにある中国語や英語も読み取ります。</p></div></div>
+          <div class="script"><div class="glyph" lang="ar">عربي</div><div><h3>アラビア語</h3><p>右から左に書かれた行を正しい読み順に戻し、数字、パーセント、かっこ、句読点も正しい位置に配置します。</p></div></div>
+        </div>
+        <div>
+          <div class="ocr-points">
+            <p><b>OCR中も作業を続けられる</b>OCRはバックグラウンドで実行されます。本を認識している間も、別のPDFを新しいタブで開いて読んだり、注釈を付けて保存したりできます。<em>メモリにご注意ください:</em> OCRは多くのメモリを使うため、OCRの実行中に非常に大きなPDFを開いたり、複数のファイルを同時にOCRしたりすると、PCのメモリが不足してアプリが動かなくなることがあります。</p>
+            <p><b>検索可能なPDF</b>ページ画像の下に透明テキストを埋め込むので、どのPDFビューアーでも検索やコピーができます。</p>
+            <p><b>一括OCR</b>PDFの入ったフォルダーをドロップすれば、すべて検索可能なPDFになります。</p>
+            <p><b>まず傾きを補正</b>傾いたページは読み取る前にまっすぐにするので、行をきれいに認識できます。</p>
+            <p><b>2段組みも正しい順番で</b>2段組みのページは段ごとに読み取るので、コピーしたテキストも検索も、読む順番どおりになります。</p>
+            <p><b>精度の低いOCRを置き換え</b>以前のソフトがスキャンの下に埋め込んだテキストを、新しい結果に置き換えます。</p>
+          </div>
+        </div>
+      </div>
+      <div class="langs" id="languages">
+        <h3>OCR対応50言語 <span class="muted">· すべて標準搭載</span></h3>
+        <dl class="lang-grid">
+          <div><dt>西ヨーロッパ</dt><dd>英語、フランス語、ドイツ語、スペイン語、ポルトガル語、イタリア語、オランダ語、カタルーニャ語、アイルランド語</dd></div>
+          <div><dt>北ヨーロッパ</dt><dd>デンマーク語、ノルウェー語、スウェーデン語、フィンランド語、アイスランド語</dd></div>
+          <div><dt>中央・東ヨーロッパ</dt><dd>ポーランド語、チェコ語、スロバキア語、ハンガリー語、スロベニア語、クロアチア語、セルビア語（ラテン文字）、ボスニア語、アルバニア語</dd></div>
+          <div><dt>バルト諸国</dt><dd>リトアニア語、エストニア語</dd></div>
+          <div><dt>その他のラテン文字の言語</dt><dd>トルコ語、インドネシア語、マレー語、タガログ語、スワヒリ語、ラテン語</dd></div>
+          <div><dt>キリル文字</dt><dd>ロシア語、ウクライナ語、ベラルーシ語、ブルガリア語、セルビア語（キリル文字）、マケドニア語、カザフ語、キルギス語、タジク語、モンゴル語、タタール語</dd></div>
+          <div><dt>デーヴァナーガリー文字</dt><dd>ヒンディー語、マラーティー語、ネパール語、サンスクリット語</dd></div>
+          <div><dt>東アジア</dt><dd>韓国語（ハングル・漢字）、中国語（簡体字・繁体字）、日本語</dd></div>
+          <div><dt>右から左に書く言語</dt><dd>アラビア語</dd></div>
+        </dl>
+        <p class="lang-note">ラテン文字の言語は、使われる文字がすべて認識エンジンの文字セットに含まれている場合に掲載しています。ルーマニア語、ラトビア語、ベトナム語、マルタ語、エスペラント語、ウェールズ語、アゼルバイジャン語は文字セットにない文字を一部使うため、その文字が似た文字として読み取られることがあります。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="chapter" id="bookmarks">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">6</span>
+        <h2>しおりと目次リンクを自動作成</h2>
+        <p>1,000ページのスキャンも、目的のページにすぐ移動できなければ役に立ちません。BixoPDFは本の目次ページを読み取り、しおりツリーとリンクを自動で作成します。あとは結果を確認し、判断に迷った数行を直すだけです。</p>
+      </div>
+      <div class="two" style="align-items:center">
+        <ol class="steps">
+          <li><div><h3>目次ページを指定</h3><p>ページ一覧で目次ページを選びます（例: 5～12ページ）。</p></div></li>
+          <li><div><h3>すべての項目を読み取り</h3><p>タイトル、番号から判断した階層、印刷されたページ番号を読み取ります。印刷上のページ番号は、各ページの上下に印刷されたページ番号、本のページラベル、またはページのずれをもとにPDFのページと照合し、各ページのテキストで確認します。段落番号（1.01、2.30）で構成された本や、OCRで読み取った目次ページにも対応しています。ページ番号の読み誤り、柱（ページ上部の見出し）、重複した文字も処理し、タイトルはそのページの見出しをもとに修正します。</p></div></li>
+          <li><div><h3>数クリックで修正</h3><p>疑わしい行には印が付きます。＋と−で階層を変えたり、ページ番号を直したり、行を含めるか外すかを選んだりできます。</p></div></li>
+          <li><div><h3>しおりとリンクを作成</h3><p>目次の各行が、その章へのリンクになります。リンクはほかのPDFビューアーでも使えます。もう一度実行すると、新しいリンクを重ねるのではなく、古いリンクを置き換えます。</p></div></li>
+        </ol>
+        <div class="demo-toc" aria-label="例: しおりツリーと、リンクを付けた目次ページ">
+          <div class="tree">
+            <div class="h">しおり</div>
+            <div class="bm" lang="en"><span class="pg">P13</span>Table of Contents</div>
+            <div class="bm" lang="en"><span class="pg">P21</span>1. Introduction</div>
+            <div class="bm l2" lang="en"><span class="pg">P22</span>1.1 Scope of cover</div>
+            <div class="bm l2 on" lang="en"><span class="pg">P31</span>1.2 Insurable interest</div>
+            <div class="bm l3" lang="en"><span class="pg">P33</span>(a) Nature</div>
+            <div class="bm" lang="en"><span class="pg">P49</span>2. Formation</div>
+            <div class="bm l2" lang="en"><span class="pg">P50</span>2.1 Utmost good faith</div>
+            <div class="bm" lang="en"><span class="pg">P87</span>3. Warranties</div>
+          </div>
+          <div class="leaf" aria-hidden="true" lang="en">
+            <div class="ttl">CONTENTS</div>
+            <div class="row"><span>1. Introduction</span><span class="d"></span><span>1</span></div>
+            <div class="row ind"><span>1.1 Scope of cover</span><span class="d"></span><span>2</span></div>
+            <div class="row ind link"><span>1.2 Insurable interest</span><span class="d"></span><span>11</span><span class="cursor"></span></div>
+            <div class="row ind"><span>(a) Nature</span><span class="d"></span><span>13</span></div>
+            <div class="row"><span>2. Formation</span><span class="d"></span><span>29</span></div>
+            <div class="row ind"><span>2.1 Utmost good faith</span><span class="d"></span><span>30</span></div>
+            <div class="row"><span>3. Warranties</span><span class="d"></span><span>67</span></div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="shot" style="margin-top:clamp(2rem,5vw,3rem)">
+        <img src="../shot-contents.webp" width="1600" height="722" loading="lazy" alt="目次ウィンドウ。左は各項目が枠で囲まれ、階層ごとに番号が付いた目次ページ。右は階層・タイトル・印刷ページ・PDFページを並べた項目一覧">
+        <figcaption>目次ウィンドウ: 目次ページから読み取った項目の階層とページを照合します。必要な行を修正したら、しおりとリンクを作成します。</figcaption>
+      </figure>
+      <h3 style="font-size:var(--step-1);margin:clamp(3rem,6vw,4.5rem) 0 1.2rem">毎日の作業に使うツールも</h3>
+      <div class="tools">
+        <div><h3>スキャンからテキストを</h3><p>OCRテキストは、このアプリでもほかのPDFビューアーでも選択・コピー・検索でき、テキストファイルとして書き出すこともできます。</p></div>
+        <div><h3>ページ</h3><p>ページの挿入・削除・移動・回転・トリミング・分割。i、ii、1、2のようなページラベルも設定できます。</p></div>
+        <div><h3>結合</h3><p>複数のPDFや画像を1つのファイルにまとめます。アプリからでも、エクスプローラーの右クリックメニューからでも使えます。</p></div>
+        <div><h3>圧縮</h3><p>白黒化、グレースケール、JPEG品質、解像度でスキャンを小さくします。先にサイズの見積もりを表示します。</p></div>
+        <div><h3>複数ファイルを検索</h3><p>フォルダー内のすべてのPDFから単語やフレーズを検索します。改行で分かれていても見つけ出し、そのページを開きます。</p></div>
+        <div><h3>保護と書き出し</h3><p>AES-256によるパスワード保護、ページをJPGやPNGで保存、OCRテキストの書き出しができます。</p></div>
+        <div><h3>保護されたPDFもわかりやすく</h3><p>パスワードを求める前に、その文書で何が制限されているか（印刷、変更、コピー、コメント、ページ）と、パスワードなしで閲覧できるかどうかを表示します。</p></div>
+        <div><h3>集中モード</h3><p>F11キーでページ以外をすべて隠し、本のようにページをめくれます。ハイライト、メモ、辞書もそのまま使えます。</p></div>
+        <div><h3>次を検索・前を検索</h3><p>F3とShift+F3で、文書内の一致箇所を順にたどれます。ズームは10%刻みで変更できます。</p></div>
+        <div><h3>透かし</h3><p>テキスト、ロゴ、またはその両方を好きな色で、指定したページ・奇数ページ・偶数ページに入れられます。アラビア語やヒンディー語もWindowsと同じように表示され、削除も同じくかんたんです。</p></div>
+        <div><h3>WordとExcel</h3><p>PDFを、フォント・見出し・表を保ったWord文書や、Excelブックとして保存できます。OCRテキストも含まれます。</p></div>
+        <div><h3>8言語の表示</h3><p>アプリ自体が英語、韓国語、日本語、中国語（簡体字・繁体字）、ロシア語、ヒンディー語、アラビア語に対応。アラビア語では右から左のレイアウトになります。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="chapter" id="compress">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">7</span>
+        <h2>大きなスキャンを小さく</h2>
+        <p>スキャン文書は数百MBにもなり、メールで送ったり、裁判所や取引先のポータルにアップロードしたり、何千件も保管したりするには大きすぎます。圧縮の度合いを選び、保存する前にサイズとページの仕上がりを確認して、小さくしたコピーを保存できます。</p>
+      </div>
+      <div class="cmp">
+        <div class="cmp-example">
+          <p class="eyebrow">実際の本</p>
+          <h3><span lang="en">The Law of Marine Insurance</span> · 1,082ページのスキャン</h3>
+          <div class="size-row"><span class="size-lbl">圧縮前</span><span class="size-bar"><span style="--w:100%"></span></span><span class="size-val">609 MB</span></div>
+          <div class="size-row after"><span class="size-lbl">圧縮後</span><span class="size-bar"><span style="--w:54.5%"></span></span><span class="size-val">332 MB</span></div>
+          <p class="muted cmp-foot">45%小さくなり、カラーページはカラーのまま残りました。文字だけのページを白黒にすると、10分の1以下になることもあります。</p>
+        </div>
+        <div class="cmp-options">
+          <div class="opt"><h3>白黒</h3><p>文字のページをくっきりした1ビット画像にします。最も小さくなる方法です。しきい値は自動でも手動でも設定できます。</p></div>
+          <div class="opt"><h3>グレースケール</h3><p>カラーでスキャンされた白黒の文書から、不要な色を取り除きます。</p></div>
+          <div class="opt"><h3>JPEG品質</h3><p>写真や陰影のあるページを、選んだ品質で保存します。</p></div>
+          <div class="opt"><h3>解像度</h3><p>72～300 dpi。画面表示やメールなら100～150、印刷なら200～300が目安です。拡大はしません。</p></div>
+          <div class="opt"><h3>例外</h3><p>写真、表紙、図のあるページは自動的に元の色のまま。手を加えないページを指定することもできます: <code>1, 5, 120-130</code></p></div>
+          <div class="opt"><h3>まずテスト</h3><p>ファイルに書き込む前に、新しいサイズの見積もりと、拡大して確認できる圧縮前後のプレビューを表示します。</p></div>
+        </div>
+      </div>
+      <div class="note">
+        <p><b>ほかは何も失われません。</b>テキスト、OCRテキスト、注釈、しおりはそのまま。再圧縮するのはページ画像だけです。</p>
+        <p><b>元のファイルはそのまま。</b>結果は新しいファイルとして保存され、別のタブで開くので、見比べることができます。</p>
+        <p><b>検索もそのまま。</b>OCR済みの本は圧縮後も、どのPDFビューアーでも検索・コピーできます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="chapter" id="price">
+    <div class="wrap">
+      <div class="chap-head">
+        <span class="num">8</span>
+        <h2>価格は$29のみ</h2>
+        <p>プランの区別も月額料金もありません。このページで紹介した機能はすべて含まれています。Microsoft Storeでは、お住まいの国・地域の通貨で価格が表示されます。</p>
+      </div>
+      <div class="price">
+        <div class="ticket">
+          <div class="amt"><sup>$</sup>29</div>
+          <p class="per">BixoPDF · 製品版 · Microsoft Store</p>
+          <ul>
+            <li>しおり・注釈・メモ</li>
+            <li>スキャン補正、OCR、しおりとリンクの自動作成</li>
+            <li>OCRの全言語を収録</li>
+            <li>7言語の辞書、言語パックは無料</li>
+            <li>オフラインで動作、アカウント不要（辞書の言語パックは一度だけダウンロード）</li>
+            <li>Windows 10（1809以降）・11、64ビット</li>
+            <li>アップデートはMicrosoft Storeから</li>
+          </ul>
+          <a class="btn btn-primary" data-goatcounter-click="store-price" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM?hl=ja-JP&gl=JP">Microsoft Storeで入手</a>
+          <p class="bulk">企業や団体で多数のライセンスをご購入の場合は、<a href="mailto:support@bixopdf.com">support@bixopdf.com</a> まで直接ご連絡ください。</p>
+        </div>
+        <div class="compare">
+          <p>多くのPDFソフトはサブスクリプションで販売されており、1年分の料金だけでこの価格の数倍になります。</p>
+          <p><strong>BixoPDFは買い切りです。</strong>本格的なPDF編集ソフトに、スキャン文書を読みやすく、検索しやすく、移動しやすくするための機能をそろえました。</p>
+        </div>
+      </div>
+      <div class="trial" id="trial">
+        <div>
+          <h3>15日間の体験版をダウンロード</h3>
+          <p>体験版は製品版と同じアプリです。このページで紹介したすべての機能を、透かしも制限もなく、インストールした日から15日間お使いいただけます。</p>
+          <a class="btn btn-primary" data-goatcounter-click="trial-section" href="https://github.com/nimis0612/bixopdf-site/releases/latest/download/BixoPDF-Trial-Setup.exe">体験版をダウンロード（15日間・無料）</a>
+          <p class="file">BixoPDF-Trial-Setup.exe · バージョン 1.3.6 · 163 MB · Windows 10（1809以降）・11、64ビット<br>SHA-256 1482c83822dd8140e00220454c590f02296d60509cc3797514841fa070f94ac9</p>
+        </div>
+        <ul>
+          <li><b>体験版はPC 1台につき1回です。</b>アプリを削除して再インストールしても、PCの時計を戻しても、新しい体験期間は始まりません。</li>
+          <li><b>15日が過ぎると、</b>体験版では文書を開けなくなり、製品版の入手方法が表示されます。PDFや設定はそのまま残ります。</li>
+          <li><b>引き続きBixoPDFを使うには、</b>Microsoft Storeで製品版を入手してください。体験版とは別にインストールされるので、体験版はWindowsの「設定」→「アプリ」から削除してください。</li>
+          <li><b>Windowsの警告が表示されることがあります。</b>体験版のセットアップにはまだコード署名がないため、Windows SmartScreenで「WindowsによってPCが保護されました」と表示される場合があります。<i>詳細情報</i>をクリックし、<i>実行</i>を選んでください。Store版はMicrosoftの審査を受けているため、警告は表示されません。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="faq">
+    <div class="wrap">
+      <div class="chap-head" style="margin-bottom:1.5rem"><span class="num" aria-hidden="true">?</span><h2>よくある質問</h2><p>最初によく寄せられる質問に、簡単にお答えします。</p></div>
+      <div class="faq">
+        <details><summary>購入する前に試せますか？</summary><p>はい。<a href="#trial">15日間の体験版</a>では、製品版と同じアプリを15日間お使いいただけます。体験版はPC 1台につき1回で、再インストールしても新たに始まることはありません。その後は、Microsoft Storeで製品版をお求めいただけます。</p></details>
+        <details><summary>OCRにはインターネット接続が必要ですか？</summary><p>いいえ。認識エンジンはアプリと一緒にインストールされ、お使いのPC上で動作します。文書がどこかにアップロードされることはありません。</p></details>
+        <details><summary>辞書にはインターネット接続が必要ですか？</summary><p>必要なのは、辞書パネルで言語パックをダウンロードするときの1回だけです。言語パックは無料です。その後の検索はPC上で行われ、調べた単語が送信されることはありません。ダウンロードについては<a href="../privacy.html">プライバシーポリシー</a>で説明しています。</p></details>
+        <details><summary>OCRの実行中も作業を続けられますか？</summary><p>はい。OCRはバックグラウンドで実行されるので、長いスキャンを認識している間も、別のPDFを新しいタブで開いて読んだり、ハイライトやメモを追加して保存したりできます。ただし、OCRは多くのメモリを使います。メモリの少ないPCでは、OCRの実行中に非常に大きなPDFを開いたり、複数のファイルを同時にOCRしたりすると、アプリが動かなくなることがあります。先に作業内容を保存し、1つのOCRが終わってから次を始めてください。</p></details>
+        <details><summary>アプリはどの言語で使えますか？</summary><p>英語、韓国語、日本語、中国語（簡体字・繁体字）、ロシア語、ヒンディー語、アラビア語です。起動時はWindowsの表示言語で表示され、「設定」→「言語」で切り替えられます。アラビア語では、ウィンドウが右から左のレイアウトになります。OCRは、アプリの表示言語にかかわらず50言語を読み取ります。</p></details>
+        <details><summary>対応しているWindowsのバージョンは？</summary><p>Windows 10 バージョン1809以降と、Windows 11です（64ビット版PC）。</p></details>
+        <details><summary>しおりやリンクは、ほかのPDFビューアーでも使えますか？</summary><p>はい。標準的なPDFのしおりとリンク注釈として保存されます。</p></details>
+        <details><summary>以前のOCRソフトがPDFに残したテキストはどうなりますか？</summary><p>そのテキストがページ画像の下に隠れている場合は、保存するときにBixoPDFが新しいOCRテキストに置き換えます。テキストがページに見えている内容そのものである場合は、先に確認を求めます。</p></details>
+        <details><summary>PDFを開く既定のアプリにできますか？</summary><p>はい。Windowsの「設定」→「アプリ」→「既定のアプリ」で、.pdfファイルにBixoPDFを選んでください。</p></details>
+        <details><summary>どこで購入でき、アップデートはどのように届きますか？</summary><p>BixoPDFはMicrosoft Storeで販売しています。インストールとアップデートはStoreが行い、同じMicrosoftアカウントでサインインしたすべてのWindows PCで使えます。</p></details>
+        <details><summary>ライセンスをまとめて購入できますか？</summary><p>はい。企業、法律事務所、団体での一括購入については、必要なPCの台数を添えて<a href="mailto:support@bixopdf.com">support@bixopdf.com</a>までご連絡ください。</p></details>
+        <details><summary>サポートを受けるにはどうすればよいですか？</summary><p><a href="mailto:support@bixopdf.com">support@bixopdf.com</a>までご連絡ください。お問い合わせの際に記載していただきたい内容は、<a href="../support.html">サポートページ</a>にまとめています。</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Bixo</span>
+    <nav aria-label="フッター">
+      <a data-goatcounter-click="store-footer" href="https://apps.microsoft.com/detail/9NJL2KH3TLKM?hl=ja-JP&gl=JP">購入</a>
+      <a href="#faq">よくある質問</a>
+      <a href="../support.html">サポート</a>
+      <a href="../press.html">プレス</a>
+      <a href="../privacy.html">プライバシー</a>
+      <a href="../THIRD-PARTY-NOTICES.txt">オープンソースのライセンス</a>
+    </nav>
+    <p class="langs"><a href="/" hreflang="en" lang="en">English</a> · <a href="/ko/" hreflang="ko" lang="ko">한국어</a> · <a href="/ja/" hreflang="ja" lang="ja" aria-current="page">日本語</a> · <a href="/ru/" hreflang="ru" lang="ru">Русский</a> · <a href="/ar/" hreflang="ar" lang="ar">العربية</a> · <a href="/hi/" hreflang="hi" lang="hi">हिन्दी</a></p>
+    <p class="tm">Microsoft、Windows、Microsoft Storeは、Microsoftグループ企業の商標です。</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.getElementById('stage');
+  var fixed = document.getElementById('fixed');
+  var split = document.getElementById('split');
+  function setSplit() { root.style.setProperty('--split', split.value + '%'); }
+  split.addEventListener('input', setSplit); setSplit();
+
+  var k = {
+    wght:  [document.getElementById('k-wght'),  document.getElementById('o-wght')],
+    sharp: [document.getElementById('k-sharp'), document.getElementById('o-sharp')],
+    con:   [document.getElementById('k-con'),   document.getElementById('o-con')],
+    bri:   [document.getElementById('k-bri'),   document.getElementById('o-bri')]
+  };
+  function signed(n) { return n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '0'; }
+  function apply() {
+    var w = +k.wght[0].value, s = +k.sharp[0].value, c = +k.con[0].value, b = +k.bri[0].value;
+    fixed.style.setProperty('--wght', Math.round(260 + w * 6));          // 260 (as scanned) … 860
+    fixed.style.setProperty('--blur', ((100 - s) / 100 * .8).toFixed(2) + 'px');
+    fixed.style.setProperty('--con', (1 + c / 100).toFixed(2));
+    fixed.style.setProperty('--bri', (.5 + b / 100 * 1).toFixed(2));
+    k.wght[1].value = signed(Math.round(w * 2 / 3));
+    k.sharp[1].value = s;
+    k.con[1].value = signed(c);
+    k.bri[1].value = signed(b - 50);
+  }
+  Object.keys(k).forEach(function (n) { k[n][0].addEventListener('input', apply); });
+  apply();
+})();
+</script>
+<script data-goatcounter="https://bixopdf.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
